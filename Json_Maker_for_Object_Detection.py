@@ -7,16 +7,18 @@ import time
 # TESTING SVD FROM NUMPY
 import numpy as np
 import math
+import json
 
 # User Parameters/Constants to Set
-MATCH_CL = 0.60 # Minimum confidence level (CL) required to match golden-image to scanned image
+MATCH_CL = 0.65 # Minimum confidence level (CL) required to match golden-image to scanned image
 # STICHED_IMAGES_DIRECTORY = "//mcrtp-sftp-01/aoitool/LED-Test/Slot_01/"
 # GOLDEN_IMAGES_DIRECTORY = "C:/Users/ait.lab/.spyder-py3/Automated_AOI/Golden_Images/"
 STICHED_IMAGES_DIRECTORY = "Images/Stitched_Images/"
 GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
 SLEEP_TIME = 0.00 # Time to sleep in seconds between each window step
-RENAME_TOGGLE = False
 SHOW_WINDOW = False
+PRINT_INFO = False
+NUMBER_TO_RUN = 40
 
 
 def time_convert(sec):
@@ -32,43 +34,6 @@ def deleteDirContents(dir):
     # # Used for deleting previous cropped photos from last run
     for f in os.listdir(dir):
         os.remove(os.path.join(dir, f))
-
-
-# Deletes unnecessary string in file name
-def replaceFileName(slotDir):
-    for filename in glob.glob(slotDir + "/*"):
-        # For loop with row number as "i" will take longer, so yes below seems
-        #   redundant writing each number 1 by 1, but has to be done.
-        os.rename(filename, 
-                  filename.replace("Stitcher-Snaps_for_8in_Wafer_Pave.", "")\
-                          .replace("Die-1_Pave.", "")\
-                          .replace("Die1_Pave.", "")\
-                          .replace("Med_El-A_River_1_Pave.", "")\
-                          .replace("new_RefDes_1_PaveP1.", "")\
-                          .replace("new_RefDes_1_Pave.", "")\
-                          .replace("Window_Die1_Pave.", "")\
-                          .replace("Row_1.", "Row_01.")\
-                          .replace("Col_1.", "Col_01.")\
-                          .replace("Row_2.", "Row_02.")\
-                          .replace("Col_2.", "Col_02.")\
-                          .replace("Row_3.", "Row_03.")\
-                          .replace("Col_3.", "Col_03.")\
-                          .replace("Row_4.", "Row_04.")\
-                          .replace("Col_4.", "Col_04.")\
-                          .replace("Row_5.", "Row_05.")\
-                          .replace("Col_5.", "Col_05.")\
-                          .replace("Row_6.", "Row_06.")\
-                          .replace("Col_6.", "Col_06.")\
-                          .replace("Row_7.", "Row_07.")\
-                          .replace("Col_7.", "Col_07.")\
-                          .replace("Row_8.", "Row_08.")\
-                          .replace("Col_8.", "Col_08.")\
-                          .replace("Row_9.", "Row_09.")\
-                          .replace("Col_9.", "Col_09.")\
-                          .replace(".p0", "")\
-                          .replace(".p1", "")\
-                          .replace(".20",".P_")
-                          )
 
 
 def slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize):
@@ -90,10 +55,10 @@ def getMatch(window, goldenImage, x, y):
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
         
         if max_val > MATCH_CL: 
-            print("\nFOUND MATCH")
-            print("max_val = ", max_val)
-            print("Window Coordinates: x1:", x + max_loc[0], "y1:", y + max_loc[1], \
-                  "x2:", x + max_loc[0] + w2, "y2:", y + max_loc[1] + h2)
+            # print("\nFOUND MATCH")
+            # print("max_val = ", max_val)
+            # print("Window Coordinates: x1:", x + max_loc[0], "y1:", y + max_loc[1], \
+            #       "x2:", x + max_loc[0] + w2, "y2:", y + max_loc[1] + h2)
             
             # Gets coordinates of cropped image
             return (max_loc[0], max_loc[1], max_loc[0] + w2, max_loc[1] + h2, max_val)
@@ -109,10 +74,6 @@ start_time = time.time()
 
 # Clears some of the screen for asthetics
 print("\n\n\n\n\n\n\n\n\n\n\n\n\n")
-
-# Replaces names
-if RENAME_TOGGLE:
-    replaceFileName(STICHED_IMAGES_DIRECTORY)
 
 goldenImagePath = glob.glob(GOLDEN_IMAGES_DIRECTORY + "*")
 goldenImage = cv2.imread(goldenImagePath[0])
@@ -134,16 +95,29 @@ prev_x1 = stepSizeX * 9
 rowNum = 0
 colNum = 0
 prev_matchedCL = 0
+
+
+# For Json file
 image_names = []
 image_ids = []
-image_height = []
-image_width = []
-die_index = 0
+image_heights = []
+image_widths = []
+
+# For Json file
+count_below_70 = 0
+die_index = -1
+die_ids = []
+die_image_ids = []
+category_id = []
+bboxes = np.zeros([1, 4], np.int32)
+bbox_areas = []
+die_segmentations = []
+die_iscrowd = []
 
 for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
     
-    # TESTING - Only completes up to index 4
-    if image_index == 5:
+    # TESTING - Only completes up to index (NUMBER_TO_RUN-1)
+    if image_index == NUMBER_TO_RUN:
         break
     
     # For Json file
@@ -156,8 +130,8 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
     fullImage = cv2.rotate(fullImage, cv2.ROTATE_90_COUNTERCLOCKWISE)
     
     # For Json file
-    image_height.append(fullImage.shape[0])
-    image_width.append(fullImage.shape[1])
+    image_heights.append(fullImage.shape[0])
+    image_widths.append(fullImage.shape[1])
     
     cv2.destroyAllWindows()
 
@@ -174,16 +148,6 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
     else:
         path_col_number = 20 + path_col_number // 2    
     
-    # Adding list and arrray entry
-    dieNames = ["Row_#.Col_#"]
-    die_ids = []
-    die_image_ids = []
-    category_id = []
-    bboxes = np.zeros([1, 4], np.int32)
-    bbox_areas = []
-    die_segmentations = []
-    die_iscrowd = []
-
     # loop over the sliding window
     for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize):
         # if the window does not meet our desired window size, ignore it
@@ -221,12 +185,14 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
                 bbox_area    = bbox_width * bbox_height
                 
                 # Makes sure same image does not get saved as different names
-                if y1 >= (prev_y1 + round(goldenImage.shape[0] / 4)) or y1 <= (prev_y1 - round(goldenImage.shape[0] / 4)):
+                if (y1 >= (prev_y1 + round(goldenImage.shape[0] * .9) ) 
+                    or y1 <= (prev_y1 - round(goldenImage.shape[0] * .9) ) ):
                     rowNum += 1
                     colNum = 1
+                    prev_matchedCL = 0
                     sameCol = False
                 else:
-                    if x1 >= (prev_x1 + round(goldenImage.shape[1] / 4)) or x1 <= (prev_x1 - round(goldenImage.shape[1] / 4)):
+                    if x1 >= (prev_x1 + round(goldenImage.shape[1] * .9) ):
                         colNum += 1
                         prev_matchedCL = 0
                         sameCol = False
@@ -238,20 +204,43 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
                     die_ids.append(die_index)
                     die_image_ids.append(image_ids[-1]) # image_id to place in annotations category
                     category_id.append(1)
-                    bboxes = np.append(bboxes, [[x1, y1, bbox_width, bbox_height]], axis=0)
+                    if die_index == 0:
+                        bboxes[-1] = np.array([x1, y1,bbox_width, bbox_height], ndmin=2)
+                    else:
+                        bboxes = np.append(bboxes, [[x1, y1, bbox_width, bbox_height]], axis=0)
                     bbox_areas.append(bbox_area)
-                    die_segmentations.append("")
+                    die_segmentations.append([])
                     die_iscrowd.append(0)
                     
+                    prev_y1 = y1
+                    prev_x1 = x1
+                    prev_matchedCL = matchedCL
+                    
+                    if PRINT_INFO:
+                        if (die_index+1) < 10:
+                            print("Die Number:", (die_index+1), "  matchedCL:", round(matchedCL,3))
+                        elif (die_index+1) < 100:
+                            print("Die Number:", (die_index+1), " matchedCL:", round(matchedCL,3))
+                        else:
+                            print("Die Number:", (die_index+1), "matchedCL:", round(matchedCL,3))
+                    else: 
+                        if die_index % 100 == 0:
+                            print(die_index, "out of", (NUMBER_TO_RUN*100))
+                    
                 elif sameCol == True and matchedCL > prev_matchedCL:
-                    bboxes[len(bboxes)-1] = np.array([x1, y1, 
-                                                      bbox_width, bbox_height], 
-                                                     ndmin=2)
+                    bboxes[-1] = np.array([x1, y1, bbox_width, bbox_height], ndmin=2)
                     bbox_areas[-1] = bbox_area
-                
-                prev_y1 = y1
-                prev_x1 = x1
-                if sameCol == True and matchedCL > prev_matchedCL:
+                    
+                    if PRINT_INFO:
+                        if (die_index+1) < 10:
+                            print("                matchedCL:", round(matchedCL,3))
+                        elif (die_index+1) < 100:
+                            print("                matchedCL:", round(matchedCL,3))
+                        else:
+                            print("                matchedCL:", round(matchedCL,3))
+                    
+                    prev_y1 = y1
+                    prev_x1 = x1
                     prev_matchedCL = matchedCL
                 
             # ==================================================================================
@@ -261,9 +250,119 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
 
 
 
+# Creating JSON section
+# ==================================================================================
+data = {
+    "info": {
+        "year": "2022",
+        "version": "1",
+        "description": "Created own",
+        "contributor": "Troy P.",
+        "url": "",
+        "date_created": "2022-02-13T01:11:34+00:00"
+    },
+    "licenses": [
+        {
+            "id": 1,
+            "url": "https://creativecommons.org/licenses/by/4.0/",
+            "name": "CC BY 4.0"
+        }
+    ],
+    "categories": [
+        {
+            "id": 0,
+            "name": "die",
+            "supercategory": "none"
+        },
+        {
+            "id": 1,
+            "name": "die",
+            "supercategory": "die"
+        }
+    ]
+}
 
 
 
+# Updates "image" section oc coco.json
+for image_index in image_ids:
+    if image_index == 0:
+        to_update_with = {
+            "images": [
+                {
+                    "id": image_index,
+                    "license": 1,
+                    "file_name": image_names[image_index],
+                    "height": image_heights[image_index],
+                    "width": image_widths[image_index],
+                    "date_captured": "2022-02-13T01:11:34+00:00"
+                }
+            ]
+        }
+        data.update(to_update_with)
+    else:
+        to_update_with = {
+            "images": {
+                    "id": image_index,
+                    "license": 1,
+                    "file_name": image_names[image_index],
+                    "height": image_heights[image_index],
+                    "width": image_widths[image_index],
+                    "date_captured": "2022-02-13T01:11:34+00:00"
+            }
+        }
+        data["images"].append(to_update_with["images"])
+
+
+# Updates "annotations" section oc coco.json
+for die_index in die_ids:
+    if die_index == 0:
+        to_update_with = {
+            "annotations": [
+                {
+                    "id": die_index,
+                    "image_id": die_image_ids[die_index],
+                    "category_id": category_id[die_index],
+                    "bbox": [
+                        int(bboxes[die_index][0]),
+                        int(bboxes[die_index][1]),
+                        int(bboxes[die_index][2]),
+                        int(bboxes[die_index][3])
+                    ],
+                    "area": bbox_areas[die_index],
+                    "segmentation": die_segmentations[die_index],
+                    "iscrowd": die_iscrowd[die_index]
+                }
+            ]
+        }
+        
+        data.update(to_update_with)
+        
+    else:
+        to_update_with = {
+            "annotations": {
+                    "id": die_index,
+                    "image_id": die_image_ids[die_index],
+                    "category_id": category_id[die_index],
+                    "bbox": [
+                        int(bboxes[die_index][0]),
+                        int(bboxes[die_index][1]),
+                        int(bboxes[die_index][2]),
+                        int(bboxes[die_index][3])
+                    ],
+                    "area": bbox_areas[die_index],
+                    "segmentation": die_segmentations[die_index],
+                    "iscrowd": die_iscrowd[die_index]
+            }
+        }
+        
+        data["annotations"].append(to_update_with["annotations"])
+
+
+with open('_annotations.coco.json', 'w') as f:
+    json.dump(data, f, indent=4)
+
+# ==================================================================================
 
 
 

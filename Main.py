@@ -35,9 +35,13 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-IMAGE_SIZE = 1000 # Row and column number
-DATASET_PATH = "./Aquarium_Combined/"
-NUMBER_EPOCH = 10
+SAVE_NAME = "./led.model"
+USE_CHECKPOINT = True
+IMAGE_SIZE = 2180 # Row and column number
+DATASET_PATH = "./led_dies/"
+NUMBER_EPOCH = 100
+LEARNING_RATE = 0.0001
+BATCH_SIZE = 64
 
 
 
@@ -45,6 +49,7 @@ def get_transforms(train=False):
     if train:
         transform = A.Compose([
             A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
+            A.Rotate(limit=[90,90], always_apply=True),
             A.HorizontalFlip(p=0.3),
             A.VerticalFlip(p=0.3),
             A.RandomBrightnessContrast(p=0.1),
@@ -54,6 +59,7 @@ def get_transforms(train=False):
     else:
         transform = A.Compose([
             A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
+            A.Rotate(limit=[90,90], always_apply=True),
             ToTensorV2()
         ], bbox_params=A.BboxParams(format='coco'))
     return transform
@@ -141,11 +147,16 @@ in_features = model.roi_heads.box_predictor.cls_score.in_features # we need to c
 model.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes)
 
 
+# TESTING TO LOAD MODEL
+if os.path.isfile(SAVE_NAME):
+    checkpoint = torch.load(SAVE_NAME)
+if USE_CHECKPOINT and os.path.isfile(SAVE_NAME):
+    model.load_state_dict(checkpoint)
 
 def collate_fn(batch):
     return tuple(zip(*batch))
 
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=0, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0, collate_fn=collate_fn)
 
 
 images, targets = next(iter(train_loader))
@@ -166,7 +177,7 @@ model = model.to(device)
 
 # Now, and optimizer
 params = [p for p in model.parameters() if p.requires_grad]
-optimizer = torch.optim.SGD(params, lr=0.01, momentum=0.9, nesterov=True, weight_decay=1e-4)
+optimizer = torch.optim.SGD(params, lr=LEARNING_RATE, momentum=0.9, nesterov=True, weight_decay=1e-4)
 # lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[16, 22], gamma=0.1) # lr scheduler
 
 
@@ -213,7 +224,7 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
 #             lr_scheduler.step() # 
         
     all_losses_dict = pd.DataFrame(all_losses_dict) # for printing
-    print("Epoch {}, loss: {:.6f}, loss_classifier: {:.6f}, loss_box: {:.6f}, loss_rpn_box: {:.6f}, loss_object: {:.6f}".format(
+    print("Epoch {}, loss: {:.4f}, loss_classifier: {:.4f}, loss_box: {:.4f}, loss_rpn_box: {:.4f}, loss_object: {:.4f}".format(
         epoch, 
         np.mean(all_losses),
         all_losses_dict['loss_classifier'].mean(),
@@ -239,21 +250,35 @@ for epoch in range(num_epochs):
 model.eval()
 torch.cuda.empty_cache()
 
+# Saves model
+torch.save(model.state_dict(), SAVE_NAME)
+
+
+# Testing test set
 test_dataset = AquariumDetection(root=dataset_path, split="test", transforms=get_transforms(False))
 
-img, _ = test_dataset[5]
+img, _ = test_dataset[3]
+# img, _ = train_dataset[0]
 img_int = torch.tensor(img*255, dtype=torch.uint8)
 with torch.no_grad():
     prediction = model([img.to(device)])
     pred = prediction[0]
 
+from torchvision.utils import save_image
+save_image(img.float(), "./Transformed_Images.jpg")
 
-
-
-fig = plt.figure(figsize=(14, 10))
-plt.imshow(draw_bounding_boxes(img_int,
+test_image = draw_bounding_boxes(img_int,
     pred['boxes'][pred['scores'] > 0.8],
-    [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], width=4
-).permute(1, 2, 0))
+    [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
+    width=4
+    )
+save_image((test_image/255), "./Transformed_Images-Test.jpg")
+
+# fig = plt.figure(figsize=(25, 25))
+# plt.imshow(draw_bounding_boxes(img_int,
+#     pred['boxes'][pred['scores'] > 0.8],
+#     [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
+#     width=4
+#     ).permute(1, 2, 0))
 
 
