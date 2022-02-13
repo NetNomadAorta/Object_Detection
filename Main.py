@@ -40,8 +40,8 @@ USE_CHECKPOINT = True
 IMAGE_SIZE = 2180 # Row and column number
 DATASET_PATH = "./led_dies/"
 NUMBER_EPOCH = 100
-LEARNING_RATE = 0.0001
-BATCH_SIZE = 64
+LEARNING_RATE = 0.001
+BATCH_SIZE = 128
 
 
 
@@ -257,7 +257,7 @@ torch.save(model.state_dict(), SAVE_NAME)
 # Testing test set
 test_dataset = AquariumDetection(root=dataset_path, split="test", transforms=get_transforms(False))
 
-img, _ = test_dataset[3]
+img, _ = test_dataset[0]
 # img, _ = train_dataset[0]
 img_int = torch.tensor(img*255, dtype=torch.uint8)
 with torch.no_grad():

@@ -135,7 +135,7 @@ ymin = int(pred['boxes'][pred['scores'] > 0.8][0][1])
 xmax = int(pred['boxes'][pred['scores'] > 0.8][0][2])
 ymax = int(pred['boxes'][pred['scores'] > 0.8][0][3])
 
-save_image((test_image[:, ymin:ymax, xmin:xmax]/255), "./Transformed_Images-Cropped.jpg")
+save_image((transformed_image[:, ymin:ymax, xmin:xmax]/255), "./Transformed_Images-Cropped.jpg")
 
 
 
