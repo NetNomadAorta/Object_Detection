@@ -39,9 +39,9 @@ SAVE_NAME = "./led.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 2180 # Row and column number
 DATASET_PATH = "./led_dies/"
-NUMBER_EPOCH = 100
-LEARNING_RATE = 0.001
-BATCH_SIZE = 128
+NUMBER_EPOCH = 10
+LEARNING_RATE = 0.0001
+BATCH_SIZE = int(32*8)
 
 
 
@@ -50,10 +50,11 @@ def get_transforms(train=False):
         transform = A.Compose([
             A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
             A.Rotate(limit=[90,90], always_apply=True),
-            A.HorizontalFlip(p=0.3),
-            A.VerticalFlip(p=0.3),
-            A.RandomBrightnessContrast(p=0.1),
-            A.ColorJitter(p=0.1),
+            A.Rotate(limit=[-5,5]),
+            A.HorizontalFlip(p=0.1),
+            A.VerticalFlip(p=0.01),
+            A.ColorJitter(brightness=0.10, contrast=0.05, 
+                          saturation=0.05, hue=0.05, p=0.1),
             ToTensorV2()
         ], bbox_params=A.BboxParams(format='coco'))
     else:
