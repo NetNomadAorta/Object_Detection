@@ -17,8 +17,9 @@ STICHED_IMAGES_DIRECTORY = "Images/Stitched_Images/"
 GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
 SLEEP_TIME = 0.00 # Time to sleep in seconds between each window step
 SHOW_WINDOW = False
-PRINT_INFO = False
-NUMBER_TO_RUN = 40
+PRINT_INFO = True
+SAVE_WAFERMAP = False
+NUMBER_TO_RUN = 10
 
 
 def time_convert(sec):
@@ -40,6 +41,10 @@ def slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize):
     # Slides a window across the stitched-image
     for y in range(0, fullImage.shape[0], stepSizeY):
         for x in range(0, fullImage.shape[1], stepSizeX):
+            if (y + windowSize[1]) > fullImage.shape[0]:
+                y = fullImage.shape[0] - windowSize[1]
+            if (x + windowSize[0]) > fullImage.shape[1]:
+                x = fullImage.shape[1] - windowSize[0]
             # Yield the current window
             yield (x, y, fullImage[y:y + windowSize[1], x:x + windowSize[0]])
 
@@ -157,7 +162,7 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
         # Draw rectangle over sliding window for debugging and easier visual
         displayImage = fullImage.copy()
         cv2.rectangle(displayImage, (x, y), (x + winW, y + winH), (255, 0, 180), 2)
-        displayImageResize = cv2.resize(displayImage, (1000, round(fullImage.shape[0] / fullImage.shape[1] * 1000)))
+        displayImageResize = cv2.resize(displayImage, (850, round(fullImage.shape[0] / fullImage.shape[1] * 850)))
         if SHOW_WINDOW:
             cv2.imshow(str(fullImagePath), displayImageResize) # TOGGLE TO SHOW OR NOT
         cv2.waitKey(1)
@@ -249,6 +254,17 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
     rowNum = 0
     colNum = 0
     sameCol = False
+    
+    if SAVE_WAFERMAP:
+        fullImage_bboxes = fullImage.copy()
+        
+        for bbox in bboxes:
+            cv2.rectangle(fullImage_bboxes, 
+                          (int(bbox[0]), int(bbox[1])), 
+                          (int(bbox[0] + bbox[2]), int(bbox[1]) + bbox[3]), 
+                          (255, 255, 255), 
+                          round(goldenImage.size * 0.00001))
+        cv2.imwrite("./waferMap.jpg", fullImage_bboxes)
 
 
 
