@@ -1,7 +1,6 @@
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import os
-
 import torch
 import torchvision
 from torchvision import datasets, models
@@ -15,10 +14,7 @@ import math
 from PIL import Image
 import cv2
 import albumentations as A  # our data augmentation library
-
 import matplotlib.pyplot as plt
-
-
 # remove arnings (optional)
 import warnings
 warnings.filterwarnings("ignore")
@@ -27,11 +23,10 @@ import datetime
 import time
 from tqdm import tqdm # progress bar
 from torchvision.utils import draw_bounding_boxes
-
 from pycocotools.coco import COCO
-
 # Now, we will define our transforms
 from albumentations.pytorch import ToTensorV2
+from torchvision.utils import save_image
 
 
 # User parameters
@@ -39,10 +34,21 @@ SAVE_NAME = "./led.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 2180 # Row and column number
 DATASET_PATH = "./led_dies/"
+TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
+PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
+SAVE_CROPPED_IMAGES = False
 NUMBER_EPOCH = 10
 LEARNING_RATE = 0.001
 BATCH_SIZE = 16
 
+
+
+def time_convert(sec):
+    mins = sec // 60
+    sec = sec % 60
+    hours = mins // 60
+    mins = mins % 60
+    print("Time Lapsed = {0}h:{1}m:{2}s".format(int(hours), int(mins), round(sec) ) )
 
 
 def get_transforms(train=False):
@@ -66,7 +72,8 @@ def get_transforms(train=False):
 
 
 
-
+# Starting stopwatch to see how long process takes
+start_time = time.time()
 
 dataset_path = DATASET_PATH
 
@@ -102,40 +109,47 @@ model = model.to(device)
 model.eval()
 torch.cuda.empty_cache()
 
-
-
-
-image = cv2.imread("./Images/To_Predict/Row_01.Col_28.P_01.jpg")
-image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
 transforms = A.Compose([
     A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
     A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
 
-# transforms=get_transforms(False)
-transformed_image = transforms(image=image)
-transformed_image = transformed_image["image"]
 
-with torch.no_grad():
-    prediction = model([(transformed_image/255).to(device)])
-    pred = prediction[0]
+for image_name in os.listdir(TO_PREDICT_PATH):
+    image_path = os.path.join(TO_PREDICT_PATH, image_name)
 
-test_image = draw_bounding_boxes(transformed_image,
-    pred['boxes'][pred['scores'] > 0.8],
-    [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
-    width=4
-    )
-from torchvision.utils import save_image
-save_image((test_image/255), "./Transformed_Images-Test.jpg")
-
-xmin = int(pred['boxes'][pred['scores'] > 0.8][0][0])
-ymin = int(pred['boxes'][pred['scores'] > 0.8][0][1])
-xmax = int(pred['boxes'][pred['scores'] > 0.8][0][2])
-ymax = int(pred['boxes'][pred['scores'] > 0.8][0][3])
-
-save_image((transformed_image[:, ymin:ymax, xmin:xmax]/255), "./Transformed_Images-Cropped.jpg")
+    image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    
+    # transforms=get_transforms(False)
+    transformed_image = transforms(image=image)
+    transformed_image = transformed_image["image"]
+    
+    with torch.no_grad():
+        prediction = model([(transformed_image/255).to(device)])
+        pred = prediction[0]
+    
+    test_image = draw_bounding_boxes(transformed_image,
+        pred['boxes'][pred['scores'] > 0.8],
+        [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
+        width=4
+        )
+    
+    # Saves full image with bounding boxes
+    save_image((test_image/255), PREDICTED_PATH + image_name)
+    
+    
+    if SAVE_CROPPED_IMAGES:
+        for box_index in range(len(pred['boxes'][pred['scores'] > 0.8]) ):
+        
+            xmin = int(pred['boxes'][pred['scores'] > 0.8][box_index][0])
+            ymin = int(pred['boxes'][pred['scores'] > 0.8][box_index][1])
+            xmax = int(pred['boxes'][pred['scores'] > 0.8][box_index][2])
+            ymax = int(pred['boxes'][pred['scores'] > 0.8][box_index][3])
+            
+            save_image(transformed_image[:, ymin:ymax, xmin:xmax]/255, 
+                       PREDICTED_PATH + image_name[:-4] + "-{}.jpg".format(box_index) )
 
 
 
@@ -159,3 +173,11 @@ save_image((transformed_image[:, ymin:ymax, xmin:xmax]/255), "./Transformed_Imag
 #     ).permute(1, 2, 0))
 
 
+
+
+print("Done!")
+
+# Stopping stopwatch to see how long process takes
+end_time = time.time()
+time_lapsed = end_time - start_time
+time_convert(time_lapsed)

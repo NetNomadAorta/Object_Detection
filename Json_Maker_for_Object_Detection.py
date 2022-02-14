@@ -227,6 +227,8 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
                         if die_index % 100 == 0:
                             print(die_index, "out of", (NUMBER_TO_RUN*100))
                     
+                # If the same die is saved twice, and the second one has better coordinates,
+                #  then below will replace the last data entry with the better data
                 elif sameCol == True and matchedCL > prev_matchedCL:
                     bboxes[-1] = np.array([x1, y1, bbox_width, bbox_height], ndmin=2)
                     bbox_areas[-1] = bbox_area
