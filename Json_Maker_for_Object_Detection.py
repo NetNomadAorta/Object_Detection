@@ -18,8 +18,8 @@ GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
 SLEEP_TIME = 0.00 # Time to sleep in seconds between each window step
 SHOW_WINDOW = False
 PRINT_INFO = True
-SAVE_WAFERMAP = True
-NUMBER_TO_RUN = 40
+SAVE_WAFERMAP = False
+NUMBER_TO_RUN = 50
 
 
 def time_convert(sec):
