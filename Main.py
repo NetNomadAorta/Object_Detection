@@ -1,7 +1,6 @@
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import os
-
 import torch
 import torchvision
 from torchvision import datasets, models
@@ -15,10 +14,7 @@ import math
 from PIL import Image
 import cv2
 import albumentations as A  # our data augmentation library
-
 import matplotlib.pyplot as plt
-
-
 # remove arnings (optional)
 import warnings
 warnings.filterwarnings("ignore")
@@ -27,20 +23,18 @@ import datetime
 import time
 from tqdm import tqdm # progress bar
 from torchvision.utils import draw_bounding_boxes
-
 from pycocotools.coco import COCO
-
 # Now, we will define our transforms
 from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
 SAVE_NAME = "./led.model"
-USE_CHECKPOINT = True
+USE_CHECKPOINT = False
 IMAGE_SIZE = 2180 # Row and column number
 DATASET_PATH = "./led_dies/"
 NUMBER_EPOCH = 10
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*8)
 
 

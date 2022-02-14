@@ -18,8 +18,8 @@ GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
 SLEEP_TIME = 0.00 # Time to sleep in seconds between each window step
 SHOW_WINDOW = False
 PRINT_INFO = True
-SAVE_WAFERMAP = False
-NUMBER_TO_RUN = 10
+SAVE_WAFERMAP = True
+NUMBER_TO_RUN = 40
 
 
 def time_convert(sec):
@@ -39,8 +39,8 @@ def deleteDirContents(dir):
 
 def slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize):
     # Slides a window across the stitched-image
-    for y in range(0, fullImage.shape[0], stepSizeY):
-        for x in range(0, fullImage.shape[1], stepSizeX):
+    for y in range(0, fullImage.shape[0] - windowSize[1]+stepSizeY, stepSizeY):
+        for x in range(0, fullImage.shape[1] - windowSize[0]+stepSizeX, stepSizeX):
             if (y + windowSize[1]) > fullImage.shape[0]:
                 y = fullImage.shape[0] - windowSize[1]
             if (x + windowSize[0]) > fullImage.shape[1]:
@@ -256,15 +256,20 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
     sameCol = False
     
     if SAVE_WAFERMAP:
+        
+        
         fullImage_bboxes = fullImage.copy()
         
-        for bbox in bboxes:
-            cv2.rectangle(fullImage_bboxes, 
-                          (int(bbox[0]), int(bbox[1])), 
-                          (int(bbox[0] + bbox[2]), int(bbox[1]) + bbox[3]), 
-                          (255, 255, 255), 
-                          round(goldenImage.size * 0.00001))
-        cv2.imwrite("./waferMap.jpg", fullImage_bboxes)
+        for index in die_ids:
+            if image_index == die_image_ids[index]:
+                cv2.rectangle(fullImage_bboxes, 
+                              (int(bboxes[index][0]), int(bboxes[index][1])), 
+                              (int(bboxes[index][0] + bboxes[index][2]), 
+                               int(bboxes[index][1]) + bboxes[index][3]), 
+                              (255, 255, 255), 
+                              round(goldenImage.size * 0.00001))
+        
+        cv2.imwrite("./waferMap-{}.jpg".format(image_index), fullImage_bboxes)
 
 
 
