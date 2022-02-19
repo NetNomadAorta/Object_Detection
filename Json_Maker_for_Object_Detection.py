@@ -19,7 +19,7 @@ SLEEP_TIME = 0.00 # Time to sleep in seconds between each window step
 SHOW_WINDOW = False
 PRINT_INFO = True
 SAVE_WAFERMAP = False
-NUMBER_TO_RUN = 50
+NUMBER_TO_RUN = 300
 
 
 def time_convert(sec):
@@ -124,7 +124,7 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
     # TESTING - Only completes up to index (NUMBER_TO_RUN-1)
     if image_index == NUMBER_TO_RUN:
         break
-    
+    print("\n\nStarting", image_name, "Image Number:", (image_index+1), "\n")
     # For Json file
     image_names.append(image_name)
     image_ids.append(image_index)
@@ -152,6 +152,8 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
         path_col_number = (path_col_number + 1) // 2
     else:
         path_col_number = 20 + path_col_number // 2    
+    
+    box_count = 0 # Number of boxes made per full 100-die image
     
     # loop over the sliding window
     for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize):
@@ -205,12 +207,15 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
                         sameCol = True
                 
                 if sameCol == False: 
+                    box_count += 1
+                    
+                    # JSON info
                     die_index += 1
                     die_ids.append(die_index)
                     die_image_ids.append(image_ids[-1]) # image_id to place in annotations category
                     category_id.append(1)
                     if die_index == 0:
-                        bboxes[-1] = np.array([x1, y1,bbox_width, bbox_height], ndmin=2)
+                        bboxes[-1] = np.array([x1, y1, bbox_width, bbox_height], ndmin=2)
                     else:
                         bboxes = np.append(bboxes, [[x1, y1, bbox_width, bbox_height]], axis=0)
                     bbox_areas.append(bbox_area)
@@ -223,14 +228,14 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
                     
                     if PRINT_INFO:
                         if (die_index+1) < 10:
-                            print("Die Number:", (die_index+1), "  matchedCL:", round(matchedCL,3))
+                            print("  Die Number:", (die_index+1), "  matchedCL:", round(matchedCL,3))
                         elif (die_index+1) < 100:
-                            print("Die Number:", (die_index+1), " matchedCL:", round(matchedCL,3))
+                            print("  Die Number:", (die_index+1), " matchedCL:", round(matchedCL,3))
                         else:
-                            print("Die Number:", (die_index+1), "matchedCL:", round(matchedCL,3))
+                            print("  Die Number:", (die_index+1), "matchedCL:", round(matchedCL,3))
                     else: 
                         if die_index % 100 == 0:
-                            print(die_index, "out of", (NUMBER_TO_RUN*100))
+                            print(" ", die_index, "out of", (NUMBER_TO_RUN*100))
                     
                 # If the same die is saved twice, and the second one has better coordinates,
                 #  then below will replace the last data entry with the better data
@@ -240,16 +245,26 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
                     
                     if PRINT_INFO:
                         if (die_index+1) < 10:
-                            print("                matchedCL:", round(matchedCL,3))
+                            print("                  matchedCL:", round(matchedCL,3))
                         elif (die_index+1) < 100:
-                            print("                matchedCL:", round(matchedCL,3))
+                            print("                  matchedCL:", round(matchedCL,3))
                         else:
-                            print("                matchedCL:", round(matchedCL,3))
+                            print("                  matchedCL:", round(matchedCL,3))
                     
                     prev_y1 = y1
                     prev_x1 = x1
                     prev_matchedCL = matchedCL
                 
+    for i in range(100-box_count):
+        # JSON info
+        die_index += 1
+        die_ids.append(die_index)
+        die_image_ids.append(image_ids[-1]) # image_id to place in annotations category
+        category_id.append(1)
+        bboxes = np.append(bboxes, [[1000, 1000, 180, 180]], axis=0)
+        bbox_areas.append(32400)
+        die_segmentations.append([])
+        die_iscrowd.append(0)
             # ==================================================================================
     rowNum = 0
     colNum = 0
