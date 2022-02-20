@@ -19,7 +19,7 @@ SLEEP_TIME = 0.00 # Time to sleep in seconds between each window step
 SHOW_WINDOW = False
 PRINT_INFO = True
 SAVE_WAFERMAP = False
-NUMBER_TO_RUN = 300
+NUMBER_TO_RUN = 50
 
 
 def time_convert(sec):
@@ -158,7 +158,7 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
     # loop over the sliding window
     for (x, y, window) in slidingWindow(fullImage, stepSizeX, stepSizeY, windowSize):
         # if the window does not meet our desired window size, ignore it
-        if window.shape[0] != winH or window.shape[1] != winW:
+        if window.shape[0] != winH or window.shape[1] != winW or box_count==100:
             continue
         
         # Draw rectangle over sliding window for debugging and easier visual
