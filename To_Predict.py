@@ -27,19 +27,22 @@ from pycocotools.coco import COCO
 # Now, we will define our transforms
 from albumentations.pytorch import ToTensorV2
 from torchvision.utils import save_image
+import shutil
 
 
 # User parameters
-SAVE_NAME = "./led.model"
+SAVE_NAME = "./led-500.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 2180 # Row and column number
+IMAGE_SIZE = 800 # Row and column number 2180
 DATASET_PATH = "./led_dies/"
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
-SAVE_CROPPED_IMAGES = False
+SAVE_FULL_IMAGES = False
+SAVE_CROPPED_IMAGES = True
 NUMBER_EPOCH = 10
 LEARNING_RATE = 0.001
 BATCH_SIZE = 16
+DIE_SPACING_SCALE = 0.99
 
 
 
@@ -49,6 +52,13 @@ def time_convert(sec):
     hours = mins // 60
     mins = mins % 60
     print("Time Lapsed = {0}h:{1}m:{2}s".format(int(hours), int(mins), round(sec) ) )
+
+
+def deleteDirContents(dir):
+    # Deletes photos in path "dir"
+    # # Used for deleting previous cropped photos from last run
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir, f))
 
 
 def get_transforms(train=False):
@@ -74,6 +84,9 @@ def get_transforms(train=False):
 
 # Starting stopwatch to see how long process takes
 start_time = time.time()
+
+# Deletes images already in "Predicted_Images" folder
+deleteDirContents(PREDICTED_PATH)
 
 dataset_path = DATASET_PATH
 
@@ -122,7 +135,6 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     
-    # transforms=get_transforms(False)
     transformed_image = transforms(image=image)
     transformed_image = transformed_image["image"]
     
@@ -130,47 +142,81 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         prediction = model([(transformed_image/255).to(device)])
         pred = prediction[0]
     
-    test_image = draw_bounding_boxes(transformed_image,
-        pred['boxes'][pred['scores'] > 0.8],
-        [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
-        width=4
-        )
+    dieCoordinates = pred['boxes'][pred['scores'] > 0.8]
+    # ALLdieCoordinates x y values are SWITCHED BUT IT WRKS
+    # dieCoordinates[:, 0] = pred['boxes'][pred['scores'] > 0.8][:, 1]
+    # dieCoordinates[:, 1] = pred['boxes'][pred['scores'] > 0.8][:, 0]
+    # dieCoordinates[:, 2] = pred['boxes'][pred['scores'] > 0.8][:, 3]
+    # dieCoordinates[:, 3] = pred['boxes'][pred['scores'] > 0.8][:, 2]
     
-    # Saves full image with bounding boxes
-    save_image((test_image/255), PREDICTED_PATH + image_name)
+    box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
+    box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
+    line_width = round(box_width * 0.0222222222)
     
+    if SAVE_FULL_IMAGES:
+        test_image = draw_bounding_boxes(transformed_image,
+            dieCoordinates,
+            [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
+            width=line_width
+            )
+        
+        # Saves full image with bounding boxes
+        save_image((test_image/255), PREDICTED_PATH + image_name)
     
     if SAVE_CROPPED_IMAGES:
-        for box_index in range(len(pred['boxes'][pred['scores'] > 0.8]) ):
+        # # Sets spacing between dies
+        die_spacing_max = int(box_width * .1) # I guessed
+        die_spacing = 1 + round( (die_spacing_max/box_width)*DIE_SPACING_SCALE, 3)
         
-            xmin = int(pred['boxes'][pred['scores'] > 0.8][box_index][0])
-            ymin = int(pred['boxes'][pred['scores'] > 0.8][box_index][1])
-            xmax = int(pred['boxes'][pred['scores'] > 0.8][box_index][2])
-            ymax = int(pred['boxes'][pred['scores'] > 0.8][box_index][3])
+        # Grabbing max and min x and y coordinate values
+        minX = int( torch.min(dieCoordinates[:, 0]) )
+        minY = int( torch.min(dieCoordinates[:, 1]) )
+        maxX = int( torch.max(dieCoordinates[:, 2]) )
+        maxY = int( torch.max(dieCoordinates[:, 3]) )
+        
+        dieNames = []
+        
+        # Changes column names in dieNames
+        for box_index in range(len(dieCoordinates)):
+            
+            x1 = int( dieCoordinates[box_index][0] )
+            y1 = int( dieCoordinates[box_index][1] )
+            x2 = int( dieCoordinates[box_index][2] )
+            y2 = int( dieCoordinates[box_index][3] )
+            
+            midX = round((x1 + x2)/2)
+            midY = round((y1 + y2)/2)
+            
+            # Creates dieNames list row and column number
+            rowNumber = str(math.floor((y1-minY)/(box_width*die_spacing)+1) )
+            colNumber = str(math.floor((x1-minX)/(box_height*die_spacing)+1) )
+    
+            # THIS PART IS FOR LED 160,000 WAFER!
+            if int(colNumber)>200:
+                colNumber = str( int(colNumber) )
+            
+            if int(colNumber) < 10:
+                colNumber = "00" + colNumber
+            elif int(colNumber) < 100:
+                colNumber = "0" + colNumber
+            
+            if int(rowNumber)>200:
+                rowNumber = str( int(rowNumber) )
+            
+            if int(rowNumber) < 10:
+                rowNumber = "00" + rowNumber
+            elif int(colNumber) < 100:
+                rowNumber = "0" + rowNumber
+            
+            dieNames.append( "R_{}.C_{}".format(rowNumber, colNumber) )
+            
+            xmin = int(dieCoordinates[box_index][0])
+            ymin = int(dieCoordinates[box_index][1])
+            xmax = int(dieCoordinates[box_index][2])
+            ymax = int(dieCoordinates[box_index][3])
             
             save_image(transformed_image[:, ymin:ymax, xmin:xmax]/255, 
-                       PREDICTED_PATH + image_name[:-4] + "-{}.jpg".format(box_index) )
-
-
-
-
-# img, _ = test_dataset[0]
-# # img, _ = train_dataset[0]
-# img_int = torch.tensor(img*255, dtype=torch.uint8)
-# with torch.no_grad():
-#     prediction = model([img.to(device)])
-#     pred = prediction[0]
-
-# from torchvision.utils import save_image
-# save_image(img.float(), "./Transformed_Images.jpg")
-
-
-# fig = plt.figure(figsize=(25, 25))
-# plt.imshow(draw_bounding_boxes(img_int,
-#     pred['boxes'][pred['scores'] > 0.8],
-#     [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
-#     width=4
-#     ).permute(1, 2, 0))
+                        PREDICTED_PATH + image_name[:-4] + "-R_{}.C_{}.jpg".format(rowNumber, colNumber) )
 
 
 

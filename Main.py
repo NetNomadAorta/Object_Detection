@@ -29,13 +29,13 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME = "./led.model"
-USE_CHECKPOINT = True
-IMAGE_SIZE = 2180 # Row and column number
+SAVE_NAME = "./led-500.model"
+USE_CHECKPOINT = False
+IMAGE_SIZE = 800 # Row and column number 2180
 DATASET_PATH = "./led_dies/"
-NUMBER_EPOCH = 50
+NUMBER_EPOCH = 20
 LEARNING_RATE = 0.001
-BATCH_SIZE = 4 # int(32*8)
+BATCH_SIZE = int(32/8) # Initially just 4
 
 
 
@@ -184,13 +184,6 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
     model.to(device)
     model.train()
     
-#     lr_scheduler = None
-#     if epoch == 0:
-#         warmup_factor = 1.0 / 1000 # do lr warmup
-#         warmup_iters = min(1000, len(loader) - 1)
-        
-#         lr_scheduler = optim.lr_scheduler.LinearLR(optimizer, start_factor = warmup_factor, total_iters=warmup_iters)
-    
     all_losses = []
     all_losses_dict = []
     
@@ -215,8 +208,6 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
         losses.backward()
         optimizer.step()
         
-#         if lr_scheduler is not None:
-#             lr_scheduler.step() # 
         
     all_losses_dict = pd.DataFrame(all_losses_dict) # for printing
     print("Epoch {}, loss: {:.4f}, loss_classifier: {:.4f}, loss_box: {:.4f}, loss_rpn_box: {:.4f}, loss_object: {:.4f}".format(
@@ -227,17 +218,25 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
         all_losses_dict['loss_rpn_box_reg'].mean(),
         all_losses_dict['loss_objectness'].mean()
     ))
+    
+    return np.mean(all_losses)
+
 
 # lr: {:.6f} = optimizer.param_groups[0]['lr'] , but I took it off from above
 
 
 
 num_epochs = NUMBER_EPOCH
+prev_all_losses = 0
 
 for epoch in range(num_epochs):
-    train_one_epoch(model, optimizer, train_loader, device, epoch)
-#     lr_scheduler.step()
-
+    all_losses = train_one_epoch(model, optimizer, train_loader, device, epoch)
+    
+    if all_losses < prev_all_losses:
+        # Saves model
+        torch.save(model.state_dict(), SAVE_NAME)
+    
+    prev_all_losses = all_losses
 
 
 # we will watch first epoich to ensure no errrors
@@ -245,29 +244,29 @@ for epoch in range(num_epochs):
 model.eval()
 torch.cuda.empty_cache()
 
-# Saves model
-torch.save(model.state_dict(), SAVE_NAME)
+# # Saves model
+# torch.save(model.state_dict(), SAVE_NAME)
 
 
-# Testing test set
-test_dataset = AquariumDetection(root=dataset_path, split="test", transforms=get_transforms(False))
+# # Testing test set
+# test_dataset = AquariumDetection(root=dataset_path, split="test", transforms=get_transforms(False))
 
-img, _ = test_dataset[0]
-# img, _ = train_dataset[0]
-img_int = torch.tensor(img*255, dtype=torch.uint8)
-with torch.no_grad():
-    prediction = model([img.to(device)])
-    pred = prediction[0]
+# img, _ = test_dataset[0]
+# # img, _ = train_dataset[0]
+# img_int = torch.tensor(img*255, dtype=torch.uint8)
+# with torch.no_grad():
+#     prediction = model([img.to(device)])
+#     pred = prediction[0]
 
-from torchvision.utils import save_image
-save_image(img.float(), "./Transformed_Images.jpg")
+# from torchvision.utils import save_image
+# save_image(img.float(), "./Transformed_Images.jpg")
 
-test_image = draw_bounding_boxes(img_int,
-    pred['boxes'][pred['scores'] > 0.8],
-    [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
-    width=4
-    )
-save_image((test_image/255), "./Transformed_Images-Test.jpg")
+# test_image = draw_bounding_boxes(img_int,
+#     pred['boxes'][pred['scores'] > 0.8],
+#     [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
+#     width=4
+#     )
+# save_image((test_image/255), "./Transformed_Images-Test.jpg")
 
 # fig = plt.figure(figsize=(25, 25))
 # plt.imshow(draw_bounding_boxes(img_int,
