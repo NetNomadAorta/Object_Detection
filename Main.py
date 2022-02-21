@@ -29,8 +29,8 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME = "./Models-OD/led-500.model"
-USE_CHECKPOINT = False
+SAVE_NAME = "./led-500.model"
+USE_CHECKPOINT = True
 IMAGE_SIZE = 800 # Row and column number 2180
 DATASET_PATH = "./led_dies/"
 NUMBER_EPOCH = 20
