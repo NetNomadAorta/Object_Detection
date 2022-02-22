@@ -29,12 +29,12 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME = "./led-500.model"
+SAVE_NAME = "./Models-OD/led-2180.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 800 # Row and column number 2180
+IMAGE_SIZE = 2180 # Row and column number 2180
 DATASET_PATH = "./led_dies/"
-NUMBER_EPOCH = 20
-LEARNING_RATE = 0.001
+NUMBER_EPOCH = 30
+LEARNING_RATE = 0.0001
 BATCH_SIZE = int(32/8) # Initially just 4
 
 
