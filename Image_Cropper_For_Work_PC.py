@@ -31,6 +31,7 @@ import shutil
 import pathlib
 from torch.autograd import Variable
 from torchvision.transforms import transforms as T
+import json
 
 
 # User parameters
@@ -43,7 +44,7 @@ AOI_SHAREDRIVE_DIR = "//mcrtp-sftp-01/aoitool/"
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
 FILE_NAME_TO_CROP = "LED-TEST"
-RENAME_TOGGLE = True
+RENAME_TOGGLE = False
 SAVE_FULL_IMAGES = False
 SAVE_CROPPED_IMAGES = True
 NUMBER_EPOCH = 10
@@ -146,14 +147,21 @@ in_features = model_1.roi_heads.box_predictor.cls_score.in_features # we need to
 model_1.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes_1)
 
 
+if torch.cuda.is_available():
+    map_location=lambda storage, loc: storage.cuda()
+else:
+    map_location='cpu'
+
+
 # TESTING TO LOAD MODEL
 if os.path.isfile(SAVE_NAME_OD):
-    checkpoint = torch.load(SAVE_NAME_OD)
+    checkpoint = torch.load(SAVE_NAME_OD, map_location = map_location)
 if USE_CHECKPOINT and os.path.isfile(SAVE_NAME_OD):
     model_1.load_state_dict(checkpoint)
 
 
-device = torch.device("cuda") # use GPU to train
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # use GPU to train
+
 model_1 = model_1.to(device)
 
 model_1.eval()
@@ -287,28 +295,30 @@ for sharedrive_file_name in os.listdir(AOI_SHAREDRIVE_DIR):
                     midY = round((y1 + y2)/2)
                     
                     # Creates dieNames list row and column number
-                    rowNumber = str(math.floor((y1-minY)/(box_width*die_spacing)+1) )
-                    colNumber = str(math.floor((x1-minX)/(box_height*die_spacing)+1) )
+                    rowNumber = math.floor((y1-minY)/(box_width*die_spacing)+1)
+                    rowNumber = str(rowNumber)
+                    colNumber = math.floor((x1-minX)/(box_height*die_spacing)+1)
+                    colNumber = str(colNumber)
                     
-                    real_rowNum = (path_row_number - 1)*10 + rowNumber
-                    real_colNum = (path_col_number - 1)*10 + colNumber
+                    real_rowNum = (path_row_number - 1)*10 + int(rowNumber)
+                    real_colNum = (path_col_number - 1)*10 + int(colNumber)
                     
                     # THIS PART IS FOR LED 160,000 WAFER!
                     if int(real_colNum)>200:
                         real_colNum = str( int(real_colNum) )
                     
                     if int(real_colNum) < 10:
-                        real_colNum = "00" + real_colNum
+                        real_colNum = "00" + str(real_colNum)
                     elif int(real_colNum) < 100:
-                        real_colNum = "0" + real_colNum
+                        real_colNum = "0" + str(real_colNum)
                     
                     if int(real_rowNum)>200:
                         real_rowNum = str( int(real_rowNum) )
                     
                     if int(real_rowNum) < 10:
-                        real_rowNum = "00" + real_rowNum
+                        real_rowNum = "00" + str(real_rowNum)
                     elif int(real_colNum) < 100:
-                        real_rowNum = "0" + real_rowNum
+                        real_rowNum = "0" + str(real_rowNum)
                     
                     dieNames.append( "R_{}.C_{}".format(real_rowNum, real_colNum) )
                     
