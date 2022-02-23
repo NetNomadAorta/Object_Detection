@@ -40,7 +40,7 @@ USE_CHECKPOINT = True
 IMAGE_SIZE = 2180 # Row and column number 2180
 DATASET_PATH = "./led_dies/"
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
-PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
+PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_FULL_IMAGES = False
 SAVE_CROPPED_IMAGES = True
 DIE_SPACING_SCALE = 0.99
@@ -126,7 +126,20 @@ transforms_1 = A.Compose([
 pred_dict = {}
 for image_name in os.listdir(TO_PREDICT_PATH):
     image_path = os.path.join(TO_PREDICT_PATH, image_name)
-
+    
+    # Grabs row and column number from image name and corrects them
+    path_row_number = int(image_name[4:6])
+    path_col_number = int(image_name[11:13])
+    if path_row_number % 2 == 1:
+        path_row_number = (path_row_number + 1) // 2
+    else:
+        path_row_number = 20 + path_row_number // 2
+    
+    if path_col_number % 2 == 1:
+        path_col_number = (path_col_number + 1) // 2
+    else:
+        path_col_number = 20 + path_col_number // 2  
+    
     image_b4_color = cv2.imread(image_path)
     image_b4_color_and_rotated = cv2.rotate(image_b4_color, cv2.ROTATE_90_COUNTERCLOCKWISE)
     image = cv2.cvtColor(image_b4_color, cv2.COLOR_BGR2RGB)
@@ -184,36 +197,41 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             midY = round((y1 + y2)/2)
             
             # Creates dieNames list row and column number
-            rowNumber = str(math.floor((y1-minY)/(box_width*die_spacing)+1) )
-            colNumber = str(math.floor((x1-minX)/(box_height*die_spacing)+1) )
-    
+            rowNumber = math.floor((y1-minY)/(box_width*die_spacing)+1)
+            rowNumber = str(rowNumber)
+            colNumber = math.floor((x1-minX)/(box_height*die_spacing)+1)
+            colNumber = str(colNumber)
+            
+            real_rowNum = (path_row_number - 1)*10 + int(rowNumber)
+            real_colNum = (path_col_number - 1)*10 + int(colNumber)
+            
             # THIS PART IS FOR LED 160,000 WAFER!
-            if int(colNumber)>200:
-                colNumber = str( int(colNumber) )
+            if int(real_colNum)>200:
+                real_colNum = str( int(real_colNum) )
             
-            if int(colNumber) < 10:
-                colNumber = "00" + colNumber
-            elif int(colNumber) < 100:
-                colNumber = "0" + colNumber
+            if int(real_colNum) < 10:
+                real_colNum = "00" + str(real_colNum)
+            elif int(real_colNum) < 100:
+                real_colNum = "0" + str(real_colNum)
             
-            if int(rowNumber)>200:
-                rowNumber = str( int(rowNumber) )
+            if int(real_rowNum)>200:
+                real_rowNum = str( int(real_rowNum) )
             
-            if int(rowNumber) < 10:
-                rowNumber = "00" + rowNumber
-            elif int(colNumber) < 100:
-                rowNumber = "0" + rowNumber
+            if int(real_rowNum) < 10:
+                real_rowNum = "00" + str(real_rowNum)
+            elif int(real_colNum) < 100:
+                real_rowNum = "0" + str(real_rowNum)
             
-            dieNames.append( "R_{}.C_{}".format(rowNumber, colNumber) )
+            dieNames.append( "R_{}.C_{}".format(real_rowNum, real_colNum) )
             
             xmin = int(dieCoordinates[box_index][0])
             ymin = int(dieCoordinates[box_index][1])
             xmax = int(dieCoordinates[box_index][2])
             ymax = int(dieCoordinates[box_index][3])
             
-            real_image_name = "-R_{}.C_{}.jpg".format(rowNumber, colNumber)
+            real_image_name = "R_{}.C_{}.jpg".format(real_rowNum, real_colNum)
             save_image(transformed_image[:, ymin:ymax, xmin:xmax]/255, 
-                        PREDICTED_PATH + image_name[:-4] + real_image_name)
+                        PREDICTED_PATH + real_image_name)
 
 
 print("Done!")
