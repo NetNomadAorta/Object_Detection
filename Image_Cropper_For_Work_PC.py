@@ -35,10 +35,10 @@ import json
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/led-500.model"
+SAVE_NAME_OD = "./Models-OD/led-2180.model"
 DATA_DIR = "./Images/Training_Images/"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 800 # Row and column number 2180
+IMAGE_SIZE = 2180 # Row and column number 2180
 DATASET_PATH = "./led_dies/"
 AOI_SHAREDRIVE_DIR = "//mcrtp-sftp-01/aoitool/"
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
