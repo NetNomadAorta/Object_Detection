@@ -303,21 +303,14 @@ for sharedrive_file_name in os.listdir(AOI_SHAREDRIVE_DIR):
                     real_rowNum = (path_row_number - 1)*10 + int(rowNumber)
                     real_colNum = (path_col_number - 1)*10 + int(colNumber)
                     
-                    # THIS PART IS FOR LED 160,000 WAFER!
-                    if int(real_colNum)>200:
-                        real_colNum = str( int(real_colNum) )
-                    
                     if int(real_colNum) < 10:
                         real_colNum = "00" + str(real_colNum)
                     elif int(real_colNum) < 100:
                         real_colNum = "0" + str(real_colNum)
                     
-                    if int(real_rowNum)>200:
-                        real_rowNum = str( int(real_rowNum) )
-                    
                     if int(real_rowNum) < 10:
                         real_rowNum = "00" + str(real_rowNum)
-                    elif int(real_colNum) < 100:
+                    elif int(real_rowNum) < 100:
                         real_rowNum = "0" + str(real_rowNum)
                     
                     dieNames.append( "R_{}.C_{}".format(real_rowNum, real_colNum) )
