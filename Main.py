@@ -60,7 +60,7 @@ def get_transforms(train=False):
     return transform
 
 
-class AquariumDetection(datasets.VisionDataset):
+class Object_Detection(datasets.VisionDataset):
     def __init__(self, root, split='train', transform=None, target_transform=None, transforms=None):
         # the 3 transform parameters are reuqired for datasets.VisionDataset
         super().__init__(root, transforms, transform, target_transform)
@@ -125,7 +125,7 @@ classes = [i[1]['name'] for i in categories.items()]
 classes
 
 
-train_dataset = AquariumDetection(root=dataset_path, transforms=get_transforms(True))
+train_dataset = Object_Detection(root=dataset_path, transforms=get_transforms(True))
 
 
 # # Lets view a sample
@@ -249,7 +249,7 @@ torch.cuda.empty_cache()
 
 
 # # Testing test set
-# test_dataset = AquariumDetection(root=dataset_path, split="test", transforms=get_transforms(False))
+# test_dataset = Object_Detection(root=dataset_path, split="test", transforms=get_transforms(False))
 
 # img, _ = test_dataset[0]
 # # img, _ = train_dataset[0]
