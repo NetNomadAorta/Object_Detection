@@ -10,6 +10,7 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader, sampler, random_split, Dataset
 import copy
 import math
+import re
 from PIL import Image
 import cv2
 import albumentations as A  # our data augmentation library
@@ -37,12 +38,12 @@ from torchvision.transforms import transforms as T
 SAVE_NAME_OD = "./Models-OD/led-2180.model"
 DATA_DIR = "./Images/Training_Images/"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 2180 # Row and column number 2180
+IMAGE_SIZE = 2336 # Row and column number 2180
 DATASET_PATH = "./led_dies/"
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_FULL_IMAGES = False
-SAVE_CROPPED_IMAGES = True
+SAVE_FULL_IMAGES = True
+SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
 
 
@@ -115,7 +116,7 @@ torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
     A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-    A.Rotate(limit=[90,90], always_apply=True),
+    # A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
 
@@ -128,8 +129,8 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     image_path = os.path.join(TO_PREDICT_PATH, image_name)
     
     # Grabs row and column number from image name and corrects them
-    path_row_number = int(image_name[4:6])
-    path_col_number = int(image_name[11:13])
+    path_row_number = int( re.findall(r'\d+', image_name)[0] )
+    path_col_number = int( re.findall(r'\d+', image_name)[1] )
     if path_row_number % 2 == 1:
         path_row_number = (path_row_number + 1) // 2
     else:

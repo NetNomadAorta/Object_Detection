@@ -29,13 +29,23 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME = "./Models-OD/led-2180.model"
+SAVE_NAME = "./Models-OD/HBCOSA-OD.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 2180 # Row and column number 2180
+IMAGE_SIZE = 2336 # Row and column number 2180
 DATASET_PATH = "./led_dies/"
 NUMBER_EPOCH = 30
-LEARNING_RATE = 0.0001
-BATCH_SIZE = int(32/8) # Initially just 4
+LEARNING_RATE = 0.001
+BATCH_SIZE = int(32/1) # Initially just 4
+
+# Transformation Parameters:
+CROP_RESIZE         = 0.95
+ROTATION            = 5     # Default: 5
+BRIGHTNESS_CHANGE   = 0.10  # Default: 0.10
+CONTRAST_CHANGE     = 0.05  # Default: 0.05
+SATURATION_CHANGE   = 0.05  # Default: 0.05
+HUE_CHANGE          = 0.05  # Default: 0.05
+HORIZ_FLIP_CHANCE   = 0.10  # Default: 0.1
+VERT_FLIP_CHANCE    = 0.01  # Default: 0.01
 
 
 
@@ -43,25 +53,32 @@ def get_transforms(train=False):
     if train:
         transform = A.Compose([
             A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-            A.Rotate(limit=[90,90], always_apply=True),
-            A.Rotate(limit=[-5,5]),
-            A.HorizontalFlip(p=0.1),
-            A.VerticalFlip(p=0.01),
-            A.ColorJitter(brightness=0.10, contrast=0.05, 
-                          saturation=0.05, hue=0.05, p=0.1),
+            # A.Rotate(limit=[90,90], always_apply=True),
+            A.GaussianBlur(blue_limit=(3,6), p=0.05),
+            A.Downscale(scale_min = 0.85, scale_max = 0.95, p = 0.01),
+            A.GaussNoise(var_limit = (1.0, 2.0), p = 0.01),
+            A.Rotate(limit=[-ROTATION,ROTATION]),
+            A.HorizontalFlip(p = HORIZ_FLIP_CHANCE),
+            A.VerticalFlip(p = VERT_FLIP_CHANCE),
+            A.ColorJitter(brightness = BRIGHTNESS_CHANGE, 
+                          contrast = CONTRAST_CHANGE, 
+                          saturation = SATURATION_CHANGE, 
+                          hue = HUE_CHANGE, 
+                          p = 0.1),
             ToTensorV2()
-        ], bbox_params=A.BboxParams(format='coco'))
+        ], bbox_params = A.BboxParams(format = 'coco') )
     else:
         transform = A.Compose([
             A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-            A.Rotate(limit=[90,90], always_apply=True),
+            # A.Rotate(limit=[90,90], always_apply=True),
             ToTensorV2()
-        ], bbox_params=A.BboxParams(format='coco'))
+        ], bbox_params = A.BboxParams(format = 'coco') )
     return transform
 
 
 class Object_Detection(datasets.VisionDataset):
-    def __init__(self, root, split='train', transform=None, target_transform=None, transforms=None):
+    def __init__(self, root, split = 'train', transform = None, 
+                 target_transform = None, transforms = None):
         # the 3 transform parameters are reuqired for datasets.VisionDataset
         super().__init__(root, transforms, transform, target_transform)
         self.split = split #train, valid, test
@@ -83,7 +100,8 @@ class Object_Detection(datasets.VisionDataset):
         target = self._load_target(id)
         target = copy.deepcopy(self._load_target(id))
         
-        boxes = [t['bbox'] + [t['category_id']] for t in target] # required annotation format for albumentations
+        # required annotation format for albumentations
+        boxes = [t['bbox'] + [t['category_id']] for t in target]
         if self.transforms is not None:
             transformed = self.transforms(image=image, bboxes=boxes)
         
