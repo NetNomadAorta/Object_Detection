@@ -35,16 +35,17 @@ from torchvision.transforms import transforms as T
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/led-2180.model"
+SAVE_NAME_OD = "./Models-OD/HBCOSA-OD.model"
 DATA_DIR = "./Images/Training_Images/"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 2336 # Row and column number 2180
-DATASET_PATH = "./led_dies/"
+DATASET_PATH = "./HBCOSA_1/"
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
-PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
+PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
 SAVE_FULL_IMAGES = True
 SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
+MIN_SCORE = 0.1
 
 
 
@@ -152,26 +153,36 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         prediction_1 = model_1([(transformed_image/255).to(device)])
         pred_1 = prediction_1[0]
     
-    dieCoordinates = pred_1['boxes'][pred_1['scores'] > 0.8]
-    # ALLdieCoordinates x y values are SWITCHED BUT IT WRKS
-    # dieCoordinates[:, 0] = pred_1['boxes'][pred_1['scores'] > 0.8][:, 1]
-    # dieCoordinates[:, 1] = pred_1['boxes'][pred_1['scores'] > 0.8][:, 0]
-    # dieCoordinates[:, 2] = pred_1['boxes'][pred_1['scores'] > 0.8][:, 3]
-    # dieCoordinates[:, 3] = pred_1['boxes'][pred_1['scores'] > 0.8][:, 2]
+    dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
+    die_classes = pred_1['labels'][pred_1['scores'] > MIN_SCORE]
     
-    box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
-    box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
-    line_width = round(box_width * 0.0222222222)
+    
+    # ALLdieCoordinates x y values are SWITCHED BUT IT WRKS
+    # dieCoordinates[:, 0] = pred_1['boxes'][pred_1['scores'] > MIN_SCORE][:, 1]
+    # dieCoordinates[:, 1] = pred_1['boxes'][pred_1['scores'] > MIN_SCORE][:, 0]
+    # dieCoordinates[:, 2] = pred_1['boxes'][pred_1['scores'] > MIN_SCORE][:, 3]
+    # dieCoordinates[:, 3] = pred_1['boxes'][pred_1['scores'] > MIN_SCORE][:, 2]
+    
+    if len(dieCoordinates) > 0:
+        box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
+        box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
+        line_width = round(box_width * 0.0222222222)
+    else: 
+        line_width = 0
     
     if SAVE_FULL_IMAGES:
         test_image = draw_bounding_boxes(transformed_image,
             dieCoordinates,
-            [classes_1[i] for i in pred_1['labels'][pred_1['scores'] > 0.8].tolist()], 
-            width=line_width
+            [classes_1[i] for i in pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()], 
+            width = line_width,
+            colors = "purple"
             )
         
         # Saves full image with bounding boxes
-        save_image((test_image/255), PREDICTED_PATH + image_name)
+        if len(pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()) != 0:
+            save_image((test_image/255), PREDICTED_PATH + image_name)
+        
+        # save_image((test_image/255), PREDICTED_PATH + image_name)
     
     if SAVE_CROPPED_IMAGES:
         # # Sets spacing between dies

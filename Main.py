@@ -32,8 +32,8 @@ from albumentations.pytorch import ToTensorV2
 SAVE_NAME = "./Models-OD/HBCOSA-OD.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 2336 # Row and column number 2180
-DATASET_PATH = "./led_dies/"
-NUMBER_EPOCH = 30
+DATASET_PATH = "./HBCOSA_1/"
+NUMBER_EPOCH = 100
 LEARNING_RATE = 0.001
 BATCH_SIZE = int(32/1) # Initially just 4
 
@@ -54,7 +54,7 @@ def get_transforms(train=False):
         transform = A.Compose([
             A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
             # A.Rotate(limit=[90,90], always_apply=True),
-            A.GaussianBlur(blue_limit=(3,6), p=0.05),
+            A.GaussianBlur(blur_limit = (3,7), p = 0.05),
             A.Downscale(scale_min = 0.85, scale_max = 0.95, p = 0.01),
             A.GaussNoise(var_limit = (1.0, 2.0), p = 0.01),
             A.Rotate(limit=[-ROTATION,ROTATION]),
