@@ -45,7 +45,7 @@ PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
 SAVE_FULL_IMAGES = True
 SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
-MIN_SCORE = 0.2
+MIN_SCORE = 0.20
 
 
 
@@ -126,6 +126,7 @@ transforms_1 = A.Compose([
 
 
 pred_dict = {}
+ii = 0
 for image_name in os.listdir(TO_PREDICT_PATH):
     image_path = os.path.join(TO_PREDICT_PATH, image_name)
     
@@ -174,7 +175,8 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         test_image = draw_bounding_boxes(transformed_image,
             dieCoordinates,
             [classes_1[i] for i in pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()], 
-            width = line_width
+            width = line_width,
+            colors = 'magenta'
             )
         
         # Saves full image with bounding boxes
@@ -243,6 +245,15 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             real_image_name = "R_{}.C_{}.jpg".format(real_rowNum, real_colNum)
             save_image(transformed_image[:, ymin:ymax, xmin:xmax]/255, 
                         PREDICTED_PATH + real_image_name)
+
+    if len(os.listdir(TO_PREDICT_PATH)) > 1000:
+        tenScale = 1000
+    else:
+        tenScale = 100
+
+    ii += 1
+    if ii % tenScale == 0:
+        print("  " + str(ii) + " of " + str(len(os.listdir(TO_PREDICT_PATH))))
 
 
 print("Done!")

@@ -35,17 +35,19 @@ IMAGE_SIZE = 2336 # Row and column number 2180
 DATASET_PATH = "./HBCOSA_1/"
 NUMBER_EPOCH = 1000
 LEARNING_RATE = 0.001
-BATCH_SIZE = int(32/1) # Initially just 4
+BATCH_SIZE = int(32*2) # Initially just 4
 
 # Transformation Parameters:
-CROP_RESIZE         = 0.95
-ROTATION            = 5     # Default: 5
+BLUR_PROBABILITY    = 0.05  # Default: 0.05 
+DOWNSCALE_PROB      = 0.20  # Default: 0.20 
+NOISE_PROBABILITY   = 0.05  # Default: 0.05 
+ROTATION            = 10    # Default: 5
 BRIGHTNESS_CHANGE   = 0.10  # Default: 0.10
 CONTRAST_CHANGE     = 0.05  # Default: 0.05
 SATURATION_CHANGE   = 0.05  # Default: 0.05
 HUE_CHANGE          = 0.05  # Default: 0.05
-HORIZ_FLIP_CHANCE   = 0.10  # Default: 0.1
-VERT_FLIP_CHANCE    = 0.01  # Default: 0.01
+HORIZ_FLIP_CHANCE   = 0.50  # Default: 0.1
+VERT_FLIP_CHANCE    = 0.50  # Default: 0.01
 
 
 
@@ -54,10 +56,10 @@ def get_transforms(train=False):
         transform = A.Compose([
             A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
             # A.Rotate(limit=[90,90], always_apply=True),
-            A.GaussianBlur(blur_limit = (3,7), p = 0.05),
-            A.Downscale(scale_min = 0.85, scale_max = 0.95, p = 0.01),
-            A.GaussNoise(var_limit = (1.0, 2.0), p = 0.01),
-            A.Rotate(limit=[-ROTATION,ROTATION]),
+            A.GaussianBlur(blur_limit = (3,7), p = BLUR_PROBABILITY),
+            A.Downscale(scale_min = 0.80, scale_max = 0.99, p = DOWNSCALE_PROB),
+            A.GaussNoise(var_limit = (1.0, 5.0), p = NOISE_PROBABILITY),
+            A.Rotate(limit = [-ROTATION,ROTATION]),
             A.HorizontalFlip(p = HORIZ_FLIP_CHANCE),
             A.VerticalFlip(p = VERT_FLIP_CHANCE),
             A.ColorJitter(brightness = BRIGHTNESS_CHANGE, 
@@ -119,7 +121,12 @@ class Object_Detection(datasets.VisionDataset):
         boxes = torch.tensor(new_boxes, dtype=torch.float32)
         
         targ = {} # here is our transformed target
-        targ['boxes'] = boxes
+        if len(boxes) == 0:
+            print(boxes)
+            boxes = torch.zeros((0,4), dtype=torch.float32)
+            targ['boxes'] = boxes
+        else:
+            targ['boxes'] = boxes
         targ['labels'] = torch.tensor([t['category_id'] for t in target], dtype=torch.int64)
         targ['image_id'] = torch.tensor([t['image_id'] for t in target])
         targ['area'] = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0]) # we have a different area
@@ -228,7 +235,7 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
         
         
     all_losses_dict = pd.DataFrame(all_losses_dict) # for printing
-    print("Epoch {}, loss: {:.4f}, loss_classifier: {:.4f}, loss_box: {:.4f}, loss_rpn_box: {:.4f}, loss_object: {:.4f}".format(
+    print("Epoch {}, l: {:.3f}, l_class: {:.3f}, l_box: {:.3f}, l_rpn_box: {:.3f}, l_obj: {:.3f}".format(
         epoch, 
         np.mean(all_losses),
         all_losses_dict['loss_classifier'].mean(),
