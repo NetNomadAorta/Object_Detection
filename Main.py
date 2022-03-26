@@ -33,7 +33,7 @@ SAVE_NAME = "./Models-OD/HBCOSA-OD.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 2336 # Row and column number 2180
 DATASET_PATH = "./HBCOSA_1/"
-NUMBER_EPOCH = 1000
+NUMBER_EPOCH = 500
 LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
 
