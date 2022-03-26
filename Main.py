@@ -3,6 +3,7 @@ import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import os
 import torch
 from torchvision import datasets, models
+from torch.utils.data import DataLoader
 import copy
 import math
 import cv2
@@ -22,7 +23,7 @@ USE_CHECKPOINT = True
 IMAGE_SIZE = 2336 # Row and column number 2180
 DATASET_PATH = "./HBCOSA_1/"
 NUMBER_EPOCH = 500
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.0001
 BATCH_SIZE = int(32*2) # Initially just 4
 
 # Transformation Parameters:
