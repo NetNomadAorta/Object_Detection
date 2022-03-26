@@ -124,11 +124,8 @@ class Object_Detection(datasets.VisionDataset):
         
         targ = {} # here is our transformed target
         if len(boxes) == 0:
-            print(boxes)
             boxes = torch.zeros((0,4), dtype=torch.float32)
-            targ['boxes'] = boxes
-        else:
-            targ['boxes'] = boxes
+        targ['boxes'] = boxes
         targ['labels'] = torch.tensor([t['category_id'] for t in target], dtype=torch.int64)
         targ['image_id'] = torch.tensor([t['image_id'] for t in target])
         targ['area'] = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0]) # we have a different area
