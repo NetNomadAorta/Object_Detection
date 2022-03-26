@@ -254,16 +254,15 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
 
 
 num_epochs = NUMBER_EPOCH
-prev_all_losses = 0
+prev_saved_all_losses = 100
 
 for epoch in range(num_epochs):
     all_losses = train_one_epoch(model, optimizer, train_loader, device, epoch)
     
-    if all_losses < prev_all_losses:
+    if all_losses < prev_saved_all_losses:
         # Saves model
         torch.save(model.state_dict(), SAVE_NAME)
-    
-    prev_all_losses = all_losses
+        prev_saved_all_losses = all_losses
 
 
 # we will watch first epoich to ensure no errrors
