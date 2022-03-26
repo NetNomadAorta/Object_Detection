@@ -1,27 +1,13 @@
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import os
 import torch
-import torchvision
-from torchvision import datasets, models
-from torchvision.transforms import functional as FT
-from torch import nn, optim
-from torch.nn import functional as F
-from torch.utils.data import DataLoader, sampler, random_split, Dataset
-import copy
 import math
 import re
-from PIL import Image
 import cv2
 import albumentations as A  # our data augmentation library
-import matplotlib.pyplot as plt
 # remove arnings (optional)
 import warnings
 warnings.filterwarnings("ignore")
-from collections import defaultdict, deque
-import datetime
 import time
-from tqdm import tqdm # progress bar
 from torchvision.utils import draw_bounding_boxes
 from pycocotools.coco import COCO
 # Now, we will define our transforms
@@ -29,9 +15,6 @@ from albumentations.pytorch import ToTensorV2
 
 from torchvision.utils import save_image
 import shutil
-import pathlib
-from torch.autograd import Variable
-from torchvision.transforms import transforms as T
 
 
 # User parameters
