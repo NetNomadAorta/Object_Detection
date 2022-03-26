@@ -38,16 +38,17 @@ LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
 
 # Transformation Parameters:
-BLUR_PROBABILITY    = 0.05  # Default: 0.05 
-DOWNSCALE_PROB      = 0.20  # Default: 0.20 
-NOISE_PROBABILITY   = 0.05  # Default: 0.05 
+BLUR_PROB           = 0.05  # Default: 0.05 
+DOWNSCALE_PROB      = 0.10  # Default: 0.20 
+NOISE_PROB          = 0.05  # Default: 0.05 
+MOTION_BLUR_PROB    = 0.05  # Default: 0.05
 ROTATION            = 10    # Default: 5
 BRIGHTNESS_CHANGE   = 0.10  # Default: 0.10
 CONTRAST_CHANGE     = 0.05  # Default: 0.05
 SATURATION_CHANGE   = 0.05  # Default: 0.05
 HUE_CHANGE          = 0.05  # Default: 0.05
-HORIZ_FLIP_CHANCE   = 0.50  # Default: 0.1
-VERT_FLIP_CHANCE    = 0.50  # Default: 0.01
+HORIZ_FLIP_CHANCE   = 0.10  # Default: 0.1
+VERT_FLIP_CHANCE    = 0.10  # Default: 0.01
 
 
 
@@ -56,9 +57,10 @@ def get_transforms(train=False):
         transform = A.Compose([
             A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
             # A.Rotate(limit=[90,90], always_apply=True),
-            A.GaussianBlur(blur_limit = (3,7), p = BLUR_PROBABILITY),
+            A.GaussianBlur(blur_limit = (3,5), p = BLUR_PROB),
             A.Downscale(scale_min = 0.80, scale_max = 0.99, p = DOWNSCALE_PROB),
-            A.GaussNoise(var_limit = (1.0, 5.0), p = NOISE_PROBABILITY),
+            A.GaussNoise(var_limit = (1.0, 10.0), p = NOISE_PROB),
+            A.MotionBlur(5, p = MOTION_BLUR_PROB),
             A.Rotate(limit = [-ROTATION,ROTATION]),
             A.HorizontalFlip(p = HORIZ_FLIP_CHANCE),
             A.VerticalFlip(p = VERT_FLIP_CHANCE),

@@ -124,7 +124,7 @@ transforms_1 = A.Compose([
 
 
 
-
+color_list =['green', 'red', 'magenta', 'blue']
 pred_dict = {}
 ii = 0
 for image_name in os.listdir(TO_PREDICT_PATH):
@@ -147,6 +147,9 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     image_b4_color_and_rotated = cv2.rotate(image_b4_color, cv2.ROTATE_90_COUNTERCLOCKWISE)
     image = cv2.cvtColor(image_b4_color, cv2.COLOR_BGR2RGB)
     
+    if ii == 0:
+        line_width = round(image.shape[0] * 0.00214)
+    
     transformed_image = transforms_1(image=image)
     transformed_image = transformed_image["image"]
     
@@ -155,37 +158,32 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         pred_1 = prediction_1[0]
     
     dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
-    die_classes = pred_1['labels'][pred_1['scores'] > MIN_SCORE]
+    die_class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()
     
-    
-    # ALLdieCoordinates x y values are SWITCHED BUT IT WRKS
-    # dieCoordinates[:, 0] = pred_1['boxes'][pred_1['scores'] > MIN_SCORE][:, 1]
-    # dieCoordinates[:, 1] = pred_1['boxes'][pred_1['scores'] > MIN_SCORE][:, 0]
-    # dieCoordinates[:, 2] = pred_1['boxes'][pred_1['scores'] > MIN_SCORE][:, 3]
-    # dieCoordinates[:, 3] = pred_1['boxes'][pred_1['scores'] > MIN_SCORE][:, 2]
-    
-    if len(dieCoordinates) > 0:
-        box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
-        box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
-        line_width = round(box_width * 0.0222222222)
-    else: 
-        line_width = 0
+    # if len(dieCoordinates) > 0:
+    #     line_width = round(image.shape[0] * 0.00214)
+    # else: 
+    #     line_width = 0
     
     if SAVE_FULL_IMAGES:
-        test_image = draw_bounding_boxes(transformed_image,
-            dieCoordinates,
-            [classes_1[i] for i in pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()], 
+        predicted_image = draw_bounding_boxes(transformed_image,
+            boxes = dieCoordinates,
+            labels = [classes_1[i] for i in die_class_indexes], 
             width = line_width,
-            colors = 'magenta'
+            colors = [color_list[i] for i in die_class_indexes]
             )
         
         # Saves full image with bounding boxes
-        if len(pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()) != 0:
-            save_image((test_image/255), PREDICTED_PATH + image_name)
+        if len(die_class_indexes) != 0:
+            save_image((predicted_image/255), PREDICTED_PATH + image_name)
         
-        # save_image((test_image/255), PREDICTED_PATH + image_name)
+        # save_image((predicted_image/255), PREDICTED_PATH + image_name)
     
     if SAVE_CROPPED_IMAGES:
+        if len(dieCoordinates) > 0:
+            box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
+            box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
+        
         # # Sets spacing between dies
         die_spacing_max = int(box_width * .1) # I guessed
         die_spacing = 1 + round( (die_spacing_max/box_width)*DIE_SPACING_SCALE, 3)
