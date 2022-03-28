@@ -19,10 +19,10 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/HBCOSA-OD.model"
+SAVE_NAME_OD = "./Models-OD/HBCOSA-OD-Half_Size.model"
 DATA_DIR = "./Images/Training_Images/"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 2336 # Row and column number 2180
+IMAGE_SIZE = 1168 # Row and column number 2180
 DATASET_PATH = "./HBCOSA_1/"
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
