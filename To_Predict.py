@@ -128,7 +128,6 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         path_col_number = 20 + path_col_number // 2  
     
     image_b4_color = cv2.imread(image_path)
-    image_b4_color_and_rotated = cv2.rotate(image_b4_color, cv2.ROTATE_90_COUNTERCLOCKWISE)
     image = cv2.cvtColor(image_b4_color, cv2.COLOR_BGR2RGB)
     
     if ii == 0:
@@ -143,11 +142,6 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     
     dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
     die_class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()
-    
-    # if len(dieCoordinates) > 0:
-    #     line_width = round(image.shape[0] * 0.00214)
-    # else: 
-    #     line_width = 0
     
     if SAVE_FULL_IMAGES:
         predicted_image = draw_bounding_boxes(transformed_image,
