@@ -18,11 +18,11 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME = "./Models-OD/HBCOSA-OD-Half_Size.model"
+SAVE_NAME = "./Models-OD/A_Unity.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 1168 # Row and column number 2180
-DATASET_PATH = "./HBCOSA_1/"
-NUMBER_EPOCH = 500
+IMAGE_SIZE = 1382 # Row and column number 2180
+DATASET_PATH = "./Training_Data/A_Unity/"
+NUMBER_EPOCH = 100
 LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
 
@@ -259,8 +259,8 @@ for epoch in range(num_epochs):
 model.eval()
 torch.cuda.empty_cache()
 
-# # Saves model
-# torch.save(model.state_dict(), SAVE_NAME)
+# Saves model
+torch.save(model.state_dict(), SAVE_NAME)
 
 
 # # Testing test set

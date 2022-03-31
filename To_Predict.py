@@ -19,17 +19,18 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/HBCOSA-OD-Half_Size.model"
+SAVE_NAME_OD = "./Models-OD/A_Unity.model"
+DATASET_PATH = "./Training_Data/A_Unity/"
+
 DATA_DIR = "./Images/Training_Images/"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 1168 # Row and column number 2180
-DATASET_PATH = "./HBCOSA_1/"
+IMAGE_SIZE = 1382 # Row and column number 2180
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
 SAVE_FULL_IMAGES = True
 SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
-MIN_SCORE = 0.20
+MIN_SCORE = 0.40
 
 
 
@@ -130,11 +131,11 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     image_b4_color = cv2.imread(image_path)
     image = cv2.cvtColor(image_b4_color, cv2.COLOR_BGR2RGB)
     
-    if ii == 0:
-        line_width = round(image.shape[0] * 0.00214)
-    
     transformed_image = transforms_1(image=image)
     transformed_image = transformed_image["image"]
+    
+    if ii == 0:
+        line_width = round(transformed_image.shape[1] * 0.00214)
     
     with torch.no_grad():
         prediction_1 = model_1([(transformed_image/255).to(device)])
