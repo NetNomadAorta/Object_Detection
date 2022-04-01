@@ -19,14 +19,15 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/A_Unity.model"
-DATASET_PATH = "./Training_Data/A_Unity/"
+SAVE_NAME_OD = "./Models-OD/SMiPE4-1090.model"
+DATASET_PATH = "./Training_Data/SMiPE4/"
 
 DATA_DIR = "./Images/Training_Images/"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 1382 # Row and column number 2180
+IMAGE_SIZE = 1090 # Row and column number 2180
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
+# PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_FULL_IMAGES = True
 SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
@@ -57,6 +58,44 @@ def deleteDirContents(dir):
 def makeDir(dir, classes_2):
     for classIndex, className in enumerate(classes_2):
         os.makedirs(dir + className, exist_ok=True)
+
+
+# Deletes unnecessary string in file name
+def replaceFileName(slot_path):
+    for file_name in os.listdir(slot_path):
+        file_path = os.path.join(slot_path, file_name)
+        # For loop with row number as "i" will take longer, so yes below seems
+        #   redundant writing each number 1 by 1, but has to be done.
+        os.rename(file_path, 
+                  file_path.replace("Stitcher-Snaps_for_8in_Wafer_Pave.", "")\
+                          .replace("Die-1_Pave.", "")\
+                          .replace("Die1_Pave.", "")\
+                          .replace("Med_El-A_River_1_Pave.", "")\
+                          .replace("new_RefDes_1_PaveP1.", "")\
+                          .replace("new_RefDes_1_Pave.", "")\
+                          .replace("Window_Die1_Pave.", "")\
+                          .replace("Row_1.", "Row_01.")\
+                          .replace("Col_1.", "Col_01.")\
+                          .replace("Row_2.", "Row_02.")\
+                          .replace("Col_2.", "Col_02.")\
+                          .replace("Row_3.", "Row_03.")\
+                          .replace("Col_3.", "Col_03.")\
+                          .replace("Row_4.", "Row_04.")\
+                          .replace("Col_4.", "Col_04.")\
+                          .replace("Row_5.", "Row_05.")\
+                          .replace("Col_5.", "Col_05.")\
+                          .replace("Row_6.", "Row_06.")\
+                          .replace("Col_6.", "Col_06.")\
+                          .replace("Row_7.", "Row_07.")\
+                          .replace("Col_7.", "Col_07.")\
+                          .replace("Row_8.", "Row_08.")\
+                          .replace("Col_8.", "Col_08.")\
+                          .replace("Row_9.", "Row_09.")\
+                          .replace("Col_9.", "Col_09.")\
+                          .replace(".p0", "")\
+                          .replace(".p1", "")\
+                          .replace(".20",".P_")
+                          )
 
 
 
@@ -107,13 +146,14 @@ transforms_1 = A.Compose([
 ])
 
 
-
+replaceFileName(TO_PREDICT_PATH)
 
 color_list =['green', 'red', 'magenta', 'blue']
 pred_dict = {}
 ii = 0
 for image_name in os.listdir(TO_PREDICT_PATH):
     image_path = os.path.join(TO_PREDICT_PATH, image_name)
+    
     
     # Grabs row and column number from image name and corrects them
     path_row_number = int( re.findall(r'\d+', image_name)[0] )
@@ -209,7 +249,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             
             if int(real_rowNum) < 10:
                 real_rowNum = "00" + str(real_rowNum)
-            elif int(real_colNum) < 100:
+            elif int(real_rowNum) < 100:
                 real_rowNum = "0" + str(real_rowNum)
             
             dieNames.append( "R_{}.C_{}".format(real_rowNum, real_colNum) )

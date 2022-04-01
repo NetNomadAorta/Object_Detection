@@ -35,16 +35,20 @@ import json
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/led-2180.model"
-DATA_DIR = "./Images/Training_Images/"
+SAVE_NAME_OD = "./Models-OD/SMiPE4-1090.model"
+DATASET_PATH = "./SMiPE4/"
+FILE_NAME_TO_CROP = "LED-TEST"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 2180 # Row and column number 2180
-DATASET_PATH = "./led_dies/"
 AOI_SHAREDRIVE_DIR = "//mcrtp-sftp-01/aoitool/"
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
+<<<<<<< Updated upstream
 FILE_NAME_TO_CROP = "SMiPE4-573"
 RENAME_TOGGLE = True
+=======
+RENAME_TOGGLE = False
+>>>>>>> Stashed changes
 SAVE_FULL_IMAGES = False
 SAVE_CROPPED_IMAGES = True
 NUMBER_EPOCH = 10
@@ -250,11 +254,6 @@ for sharedrive_file_name in os.listdir(AOI_SHAREDRIVE_DIR):
                 pred_1 = prediction_1[0]
             
             dieCoordinates = pred_1['boxes'][pred_1['scores'] > 0.8]
-            # ALLdieCoordinates x y values are SWITCHED BUT IT WRKS
-            # dieCoordinates[:, 0] = pred_1['boxes'][pred_1['scores'] > 0.8][:, 1]
-            # dieCoordinates[:, 1] = pred_1['boxes'][pred_1['scores'] > 0.8][:, 0]
-            # dieCoordinates[:, 2] = pred_1['boxes'][pred_1['scores'] > 0.8][:, 3]
-            # dieCoordinates[:, 3] = pred_1['boxes'][pred_1['scores'] > 0.8][:, 2]
             
             box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
             box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
