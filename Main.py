@@ -19,10 +19,10 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME = "./Models-OD/HBCOSA-OD-1168.model"
+SAVE_NAME = "./Models-OD/SMiPE4-1090-Multi_Label.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 1168 # Row and column number 2180
-DATASET_PATH = "./Training_Data/HBCOSA/"
+IMAGE_SIZE = 1090 # Row and column number 2180
+DATASET_PATH = "./Training_Data/SMiPE4-Multi_Label/"
 NUMBER_EPOCH = 200
 LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
