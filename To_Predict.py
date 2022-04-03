@@ -19,8 +19,8 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/SMiPE4-1090.model"
-DATASET_PATH = "./Training_Data/SMiPE4/"
+SAVE_NAME_OD = "./Models-OD/SMiPE4-1090-Multi_Label.model"
+DATASET_PATH = "./Training_Data/SMiPE4-Multi_Label/"
 
 DATA_DIR = "./Images/Training_Images/"
 USE_CHECKPOINT = True
@@ -141,14 +141,14 @@ torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
     A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-    # A.Rotate(limit=[90,90], always_apply=True),
+    A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
 
 
 replaceFileName(TO_PREDICT_PATH)
 
-color_list =['green', 'red', 'magenta', 'blue']
+color_list =['green', 'red', 'magenta', 'blue', 'orange', 'cyan', 'lime', 'purple', 'yellow']
 pred_dict = {}
 ii = 0
 for image_name in os.listdir(TO_PREDICT_PATH):
