@@ -1,6 +1,7 @@
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import os
+import time
 import torch
 from torchvision import datasets, models
 from torch.utils.data import DataLoader
@@ -18,11 +19,11 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME = "./Models-OD/A_Unity-691.model"
+SAVE_NAME = "./Models-OD/HBCOSA-OD-1168.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 691 # Row and column number 2180
-DATASET_PATH = "./Training_Data/A_Unity/"
-NUMBER_EPOCH = 100
+IMAGE_SIZE = 1168 # Row and column number 2180
+DATASET_PATH = "./Training_Data/HBCOSA/"
+NUMBER_EPOCH = 200
 LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
 
@@ -39,6 +40,14 @@ HUE_CHANGE          = 0.05  # Default: 0.05
 HORIZ_FLIP_CHANCE   = 0.10  # Default: 0.1
 VERT_FLIP_CHANCE    = 0.10  # Default: 0.01
 
+
+
+def time_convert(sec):
+    mins = sec // 60
+    sec = sec % 60
+    hours = mins // 60
+    mins = mins % 60
+    print("Time Lapsed = {0}h:{1}m:{2}s".format(int(hours), int(mins), round(sec) ) )
 
 
 def get_transforms(train=False):
@@ -123,6 +132,10 @@ class Object_Detection(datasets.VisionDataset):
     def __len__(self):
         return len(self.ids)
 
+
+
+# Starting stopwatch to see how long process takes
+start_time = time.time()
 
 torch.cuda.empty_cache()
 
@@ -263,31 +276,9 @@ torch.cuda.empty_cache()
 torch.save(model.state_dict(), SAVE_NAME)
 
 
-# # Testing test set
-# test_dataset = Object_Detection(root=dataset_path, split="test", transforms=get_transforms(False))
+print("Done!")
 
-# img, _ = test_dataset[0]
-# # img, _ = train_dataset[0]
-# img_int = torch.tensor(img*255, dtype=torch.uint8)
-# with torch.no_grad():
-#     prediction = model([img.to(device)])
-#     pred = prediction[0]
-
-# from torchvision.utils import save_image
-# save_image(img.float(), "./Transformed_Images.jpg")
-
-# test_image = draw_bounding_boxes(img_int,
-#     pred['boxes'][pred['scores'] > 0.8],
-#     [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
-#     width=4
-#     )
-# save_image((test_image/255), "./Transformed_Images-Test.jpg")
-
-# fig = plt.figure(figsize=(25, 25))
-# plt.imshow(draw_bounding_boxes(img_int,
-#     pred['boxes'][pred['scores'] > 0.8],
-#     [classes[i] for i in pred['labels'][pred['scores'] > 0.8].tolist()], 
-#     width=4
-#     ).permute(1, 2, 0))
-
-
+# Stopping stopwatch to see how long process takes
+end_time = time.time()
+time_lapsed = end_time - start_time
+time_convert(time_lapsed)

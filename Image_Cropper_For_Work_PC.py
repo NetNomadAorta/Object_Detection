@@ -1,26 +1,14 @@
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import os
+import re
 import torch
-import torchvision
-from torchvision import datasets, models
-from torchvision.transforms import functional as FT
-from torch import nn, optim
-from torch.nn import functional as F
-from torch.utils.data import DataLoader, sampler, random_split, Dataset
-import copy
+from torchvision import models
 import math
-from PIL import Image
 import cv2
 import albumentations as A  # our data augmentation library
-import matplotlib.pyplot as plt
 # remove arnings (optional)
 import warnings
 warnings.filterwarnings("ignore")
-from collections import defaultdict, deque
-import datetime
 import time
-from tqdm import tqdm # progress bar
 from torchvision.utils import draw_bounding_boxes
 from pycocotools.coco import COCO
 # Now, we will define our transforms
@@ -28,10 +16,6 @@ from albumentations.pytorch import ToTensorV2
 
 from torchvision.utils import save_image
 import shutil
-import pathlib
-from torch.autograd import Variable
-from torchvision.transforms import transforms as T
-import json
 
 
 # User parameters
@@ -224,8 +208,8 @@ for sharedrive_file_name in os.listdir(AOI_SHAREDRIVE_DIR):
             image_path = os.path.join(slot_path, image_name)
             
             # Grabs row and column number from image name and corrects them
-            path_row_number = int(image_name[4:6])
-            path_col_number = int(image_name[11:13])
+            path_row_number = int( re.findall(r'\d+', image_name)[0] )
+            path_col_number = int( re.findall(r'\d+', image_name)[1] )
             if path_row_number % 2 == 1:
                 path_row_number = (path_row_number + 1) // 2
             else:
