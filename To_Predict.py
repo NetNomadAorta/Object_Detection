@@ -148,7 +148,7 @@ transforms_1 = A.Compose([
 
 replaceFileName(TO_PREDICT_PATH)
 
-color_list =['green', 'red', 'magenta', 'blue', 'orange', 'cyan', 'lime', 'purple', 'yellow']
+color_list =['green', 'red', 'magenta', 'blue', 'orange', 'cyan', 'lime', 'turquoise', 'yellow']
 pred_dict = {}
 ii = 0
 for image_name in os.listdir(TO_PREDICT_PATH):
