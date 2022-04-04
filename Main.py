@@ -23,7 +23,7 @@ SAVE_NAME = "./Models-OD/SMiPE4-1090.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 1090 # Row and column number 2180
 DATASET_PATH = "./Training_Data/SMiPE4/"
-NUMBER_EPOCH = 1000
+NUMBER_EPOCH = 100
 LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
 
@@ -37,8 +37,8 @@ BRIGHTNESS_CHANGE   = 0.10  # Default: 0.10
 CONTRAST_CHANGE     = 0.05  # Default: 0.05
 SATURATION_CHANGE   = 0.05  # Default: 0.05
 HUE_CHANGE          = 0.05  # Default: 0.05
-HORIZ_FLIP_CHANCE   = 0.00  # Default: 0.1
-VERT_FLIP_CHANCE    = 0.00  # Default: 0.1
+HORIZ_FLIP_CHANCE   = 0.10  # Default: 0.1
+VERT_FLIP_CHANCE    = 0.10  # Default: 0.1
 
 
 
