@@ -31,7 +31,7 @@ PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
 SAVE_FULL_IMAGES = True
 SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
-MIN_SCORE = 0.70
+MIN_SCORE = 0.50
 
 
 
