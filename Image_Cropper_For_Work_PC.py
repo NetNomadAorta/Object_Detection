@@ -171,8 +171,6 @@ for sharedrive_file_name in os.listdir(AOI_SHAREDRIVE_DIR):
 
     # Runs through each slot file within the main file within stitched-image folder
     for slot_name in os.listdir(sharedrive_file_path):
-        if should_break:
-            break
         slot_path = os.path.join(sharedrive_file_path, slot_name)
         print("Starting", slot_path)
         
