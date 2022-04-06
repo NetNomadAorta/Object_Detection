@@ -19,17 +19,17 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/SMiPE4-1090.model"
-DATASET_PATH = "./Training_Data/SMiPE4/"
+SAVE_NAME_OD = "./Models-OD/HBCOSA-OD-1168.model"
+DATASET_PATH = "./Training_Data/HBCOSA/"
 
 DATA_DIR = "./Images/Training_Images/"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 1090 # Row and column number 2180
+IMAGE_SIZE = 1168 # Row and column number 2180
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
-# PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
-PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_FULL_IMAGES = False
-SAVE_CROPPED_IMAGES = True
+PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
+# PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
+SAVE_FULL_IMAGES = True
+SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
 MIN_SCORE = 0.50
 
@@ -141,7 +141,7 @@ torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
     A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-    A.Rotate(limit=[90,90], always_apply=True),
+    # A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
 
