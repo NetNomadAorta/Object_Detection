@@ -30,10 +30,8 @@ PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
 RENAME_TOGGLE = True
 SAVE_FULL_IMAGES = False
 SAVE_CROPPED_IMAGES = True
-NUMBER_EPOCH = 10
-LEARNING_RATE = 0.001
-BATCH_SIZE = 16
 DIE_SPACING_SCALE = 0.99
+MIN_SCORE = 0.5
 
 
 
@@ -173,8 +171,6 @@ for sharedrive_file_name in os.listdir(AOI_SHAREDRIVE_DIR):
 
     # Runs through each slot file within the main file within stitched-image folder
     for slot_name in os.listdir(sharedrive_file_path):
-        if should_break:
-            break
         slot_path = os.path.join(sharedrive_file_path, slot_name)
         print("Starting", slot_path)
         
@@ -232,7 +228,7 @@ for sharedrive_file_name in os.listdir(AOI_SHAREDRIVE_DIR):
                 prediction_1 = model_1([(transformed_image/255).to(device)])
                 pred_1 = prediction_1[0]
             
-            dieCoordinates = pred_1['boxes'][pred_1['scores'] > 0.8]
+            dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
             
             box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
             box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
@@ -241,7 +237,7 @@ for sharedrive_file_name in os.listdir(AOI_SHAREDRIVE_DIR):
             if SAVE_FULL_IMAGES:
                 test_image = draw_bounding_boxes(transformed_image,
                     dieCoordinates,
-                    [classes_1[i] for i in pred_1['labels'][pred_1['scores'] > 0.8].tolist()], 
+                    [classes_1[i] for i in pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()], 
                     width=line_width
                     )
                 
