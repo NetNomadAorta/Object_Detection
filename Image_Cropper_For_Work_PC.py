@@ -21,7 +21,7 @@ import shutil
 # User parameters
 SAVE_NAME_OD = "./Models-OD/SMiPE4-1090.model"
 DATASET_PATH = "./SMiPE4/"
-FILE_NAME_TO_CROP = "0-SMiPE4-573"
+FILE_NAME_TO_CROP = "SMiPE4-581"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 1090 # Row and column number 2180
 AOI_SHAREDRIVE_DIR = "//mcrtp-sftp-01/aoitool/"
