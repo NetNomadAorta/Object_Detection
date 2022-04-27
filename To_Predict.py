@@ -32,7 +32,7 @@ SAVE_ANNOTATED_IMAGES = True
 SAVE_ORIGINAL_IMAGE = False
 SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
-MIN_SCORE = 0.50
+MIN_SCORE = 0.5
 
 
 def time_convert(sec):
@@ -170,11 +170,14 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     
     dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
     die_class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()
+    # BELOW SHOWS SCORES - COMMENT OUT IF NEEDED
+    die_scores = pred_1['scores'][pred_1['scores'] > MIN_SCORE].tolist()
     
     if SAVE_ANNOTATED_IMAGES:
         predicted_image = draw_bounding_boxes(transformed_image,
             boxes = dieCoordinates,
             # labels = [classes_1[i] for i in die_class_indexes], 
+            labels = [str(round(i,2)) for i in die_scores], # SHOWS SCORE IN LABEL
             width = line_width,
             colors = [color_list[i] for i in die_class_indexes]
             )

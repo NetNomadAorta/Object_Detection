@@ -23,8 +23,8 @@ SAVE_NAME = "./Models-OD/HBCOSA-OD-1168.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 1168 # Row and column number 2180
 DATASET_PATH = "./Training_Data/HBCOSA/"
-NUMBER_EPOCH = 300
-LEARNING_RATE = 0.001
+NUMBER_EPOCH = 100
+LEARNING_RATE = 0.0001
 BATCH_SIZE = int(32*2) # Initially just 4
 
 # Transformation Parameters:
@@ -248,7 +248,7 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
         all_losses_dict['loss_objectness'].mean()
     ))
     
-    return np.mean(all_losses)
+    return ( np.mean(all_losses), all_losses_dict['loss_objectness'].mean() )
 
 
 # lr: {:.6f} = optimizer.param_groups[0]['lr'] , but I took it off from above
@@ -257,14 +257,21 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
 
 num_epochs = NUMBER_EPOCH
 prev_saved_all_losses = 100
+prev_saved_obj_loss = 100
 
 for epoch in range(num_epochs):
-    all_losses = train_one_epoch(model, optimizer, train_loader, device, epoch)
+    all_losses, obj_loss = train_one_epoch(model, optimizer, train_loader, device, epoch)
     
-    if all_losses < prev_saved_all_losses:
+    # if all_losses < prev_saved_all_losses:
+    #     # Saves model
+    #     torch.save(model.state_dict(), SAVE_NAME)
+    #     prev_saved_all_losses = all_losses
+    
+    # EXPERIMENTAL - AND COMMENTING ABOVE IS USING THIS
+    if obj_loss < prev_saved_obj_loss:
         # Saves model
         torch.save(model.state_dict(), SAVE_NAME)
-        prev_saved_all_losses = all_losses
+        prev_saved_obj_loss = obj_loss
 
 
 # we will watch first epoich to ensure no errrors
@@ -272,8 +279,8 @@ for epoch in range(num_epochs):
 model.eval()
 torch.cuda.empty_cache()
 
-# Saves model
-torch.save(model.state_dict(), SAVE_NAME)
+# # Saves model
+# torch.save(model.state_dict(), SAVE_NAME)
 
 
 print("Done!")
