@@ -24,7 +24,7 @@ USE_CHECKPOINT = True
 IMAGE_SIZE = 1168 # Row and column number 2180
 DATASET_PATH = "./Training_Data/HBCOSA/"
 NUMBER_EPOCH = 100
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
 
 # Transformation Parameters:
