@@ -19,11 +19,11 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME = "./Models-OD/Window-OD-615.model"
+SAVE_NAME = "./Models-OD/HBCOSA-OD-1168.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 615 # Row and column number 2180
-DATASET_PATH = "./Training_Data/Window/"
-NUMBER_EPOCH = 50
+IMAGE_SIZE = 1168 # Row and column number 2180
+DATASET_PATH = "./Training_Data/HBCOSA/"
+NUMBER_EPOCH = 40
 LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
 
