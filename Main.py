@@ -9,7 +9,7 @@ import copy
 import math
 import cv2
 import albumentations as A  # our data augmentation library
-# remove arnings (optional)
+# remove warnings (optional)
 import warnings
 warnings.filterwarnings("ignore")
 from tqdm import tqdm # progress bar
