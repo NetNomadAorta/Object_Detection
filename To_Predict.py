@@ -154,20 +154,6 @@ ii = 0
 for image_name in os.listdir(TO_PREDICT_PATH):
     image_path = os.path.join(TO_PREDICT_PATH, image_name)
     
-    
-    # Grabs row and column number from image name and corrects them
-    path_row_number = int( re.findall(r'\d+', image_name)[0] )
-    path_col_number = int( re.findall(r'\d+', image_name)[1] )
-    if path_row_number % 2 == 1:
-        path_row_number = (path_row_number + 1) // 2
-    else:
-        path_row_number = 20 + path_row_number // 2
-    
-    if path_col_number % 2 == 1:
-        path_col_number = (path_col_number + 1) // 2
-    else:
-        path_col_number = 20 + path_col_number // 2  
-    
     image_b4_color = cv2.imread(image_path)
     orig_image = image_b4_color
     image = cv2.cvtColor(image_b4_color, cv2.COLOR_BGR2RGB)
@@ -203,6 +189,19 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         cv2.imwrite(PREDICTED_PATH + image_name + "Original.jpg", orig_image)
     
     if SAVE_CROPPED_IMAGES:
+        # Grabs row and column number from image name and corrects them
+        path_row_number = int( re.findall(r'\d+', image_name)[0] )
+        path_col_number = int( re.findall(r'\d+', image_name)[1] )
+        if path_row_number % 2 == 1:
+            path_row_number = (path_row_number + 1) // 2
+        else:
+            path_row_number = 20 + path_row_number // 2
+        
+        if path_col_number % 2 == 1:
+            path_col_number = (path_col_number + 1) // 2
+        else:
+            path_col_number = 20 + path_col_number // 2  
+        
         if len(dieCoordinates) > 0:
             box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
             box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
