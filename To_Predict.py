@@ -19,17 +19,18 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/SMiPE4-1090.model"
-DATASET_PATH = "./Training_Data/SMiPE4/"
+SAVE_NAME_OD = "./Models-OD/Window-OD-615.model"
+DATASET_PATH = "./Training_Data/Window/"
 
 DATA_DIR = "./Images/Training_Images/"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 1090 # Row and column number 2180
+IMAGE_SIZE = 615 # Row and column number 2180
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_FULL_IMAGES = False
-SAVE_CROPPED_IMAGES = True
+SAVE_ANNOTATED_IMAGES = True
+SAVE_ORIGINAL_IMAGE = True
+SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
 MIN_SCORE = 0.50
 
@@ -141,7 +142,7 @@ torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
     A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-    A.Rotate(limit=[90,90], always_apply=True),
+    # A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
 
@@ -169,6 +170,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         path_col_number = 20 + path_col_number // 2  
     
     image_b4_color = cv2.imread(image_path)
+    orig_image = image_b4_color
     image = cv2.cvtColor(image_b4_color, cv2.COLOR_BGR2RGB)
     
     transformed_image = transforms_1(image=image)
@@ -184,10 +186,10 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
     die_class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()
     
-    if SAVE_FULL_IMAGES:
+    if SAVE_ANNOTATED_IMAGES:
         predicted_image = draw_bounding_boxes(transformed_image,
             boxes = dieCoordinates,
-            labels = [classes_1[i] for i in die_class_indexes], 
+            # labels = [classes_1[i] for i in die_class_indexes], 
             width = line_width,
             colors = [color_list[i] for i in die_class_indexes]
             )
@@ -197,6 +199,9 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             save_image((predicted_image/255), PREDICTED_PATH + image_name)
         
         # save_image((predicted_image/255), PREDICTED_PATH + image_name)
+        
+    if SAVE_ORIGINAL_IMAGE and len(die_class_indexes) != 0:
+        cv2.imwrite(PREDICTED_PATH + image_name + "Original.jpg", orig_image)
     
     if SAVE_CROPPED_IMAGES:
         if len(dieCoordinates) > 0:
