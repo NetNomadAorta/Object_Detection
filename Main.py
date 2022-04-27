@@ -23,7 +23,7 @@ SAVE_NAME = "./Models-OD/Window-OD-615.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE = 615 # Row and column number 2180
 DATASET_PATH = "./Training_Data/Window/"
-NUMBER_EPOCH = 100
+NUMBER_EPOCH = 50
 LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
 
