@@ -28,7 +28,7 @@ IMAGE_SIZE = 703 # Row and column number
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_ANNOTATED_IMAGES = True
+SAVE_ANNOTATED_IMAGES = False
 SAVE_ORIGINAL_IMAGE = True
 SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
@@ -141,7 +141,7 @@ torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
     A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-    A.Rotate(limit=[90,90], always_apply=True),
+    # A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
 
