@@ -28,11 +28,11 @@ IMAGE_SIZE = 703 # Row and column number
 TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_ANNOTATED_IMAGES = False
-SAVE_ORIGINAL_IMAGE = True
+SAVE_ANNOTATED_IMAGES = True
+SAVE_ORIGINAL_IMAGE = False
 SAVE_CROPPED_IMAGES = False
 DIE_SPACING_SCALE = 0.99
-MIN_SCORE = 0.5
+MIN_SCORE = 0.7
 
 
 def time_convert(sec):
@@ -147,6 +147,9 @@ transforms_1 = A.Compose([
 
 
 replaceFileName(TO_PREDICT_PATH)
+
+# Start FPS timer
+fps_start_time = time.time()
 
 color_list =['green', 'red', 'magenta', 'blue', 'orange', 'cyan', 'lime', 'turquoise', 'yellow']
 pred_dict = {}
@@ -276,7 +279,12 @@ for image_name in os.listdir(TO_PREDICT_PATH):
 
     ii += 1
     if ii % tenScale == 0:
-        print("  " + str(ii) + " of " + str(len(os.listdir(TO_PREDICT_PATH))))
+        fps_end_time = time.time()
+        fps_time_lapsed = fps_end_time - fps_start_time
+        print("  " + str(ii) + " of " 
+              + str(len(os.listdir(TO_PREDICT_PATH))), 
+              "-",  round(tenScale/fps_time_lapsed, 2), "FPS")
+        fps_start_time = time.time()
 
 
 print("Done!")

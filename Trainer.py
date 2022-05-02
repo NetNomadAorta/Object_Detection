@@ -262,16 +262,12 @@ prev_saved_obj_loss = 100
 for epoch in range(num_epochs):
     all_losses, obj_loss = train_one_epoch(model, optimizer, train_loader, device, epoch)
     
-    # if all_losses < prev_saved_all_losses:
-    #     # Saves model
-    #     torch.save(model.state_dict(), SAVE_NAME)
-    #     prev_saved_all_losses = all_losses
-    
-    # EXPERIMENTAL - AND COMMENTING ABOVE IS USING THIS
-    if obj_loss < prev_saved_obj_loss:
-        # Saves model
+    # Saves model
+    if (obj_loss < prev_saved_obj_loss 
+        or all_losses < (prev_saved_all_losses*0.82) ):
         torch.save(model.state_dict(), SAVE_NAME)
         prev_saved_obj_loss = obj_loss
+        prev_saved_all_losses = all_losses
 
 
 # we will watch first epoich to ensure no errrors
