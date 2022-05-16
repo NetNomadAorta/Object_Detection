@@ -19,10 +19,10 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME = "./Models-OD/Window-OD-615.model"
+SAVE_NAME = "./Models-OD/E_Electrode-OD-703.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE = 615 # Row and column number 2180
-DATASET_PATH = "./Training_Data/Window/"
+IMAGE_SIZE = 703 # Row and column number 2180
+DATASET_PATH = "./Training_Data/E_Electrode/"
 NUMBER_EPOCH = 1000
 LEARNING_RATE = 0.001
 BATCH_SIZE = int(32*2) # Initially just 4
@@ -239,7 +239,7 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
         
         
     all_losses_dict = pd.DataFrame(all_losses_dict) # for printing
-    print("Epoch {}, l: {:.3f}, l_class: {:.3f}, l_box: {:.3f}, l_rpn_box: {:.3f}, l_obj: {:.3f}".format(
+    print("Epoch {}, l: {:.2f}, l_class: {:.3f}, l_box: {:.3f}, l_rpn_box: {:.3f}, l_obj: {:.4f}".format(
         epoch, 
         np.mean(all_losses),
         all_losses_dict['loss_classifier'].mean(),
