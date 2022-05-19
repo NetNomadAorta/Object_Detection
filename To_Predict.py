@@ -22,17 +22,17 @@ import shutil
 SAVE_NAME_OD = "./Models-OD/Window-OD-615.model"
 DATASET_PATH = "./Training_Data/Window/"
 
-DATA_DIR = "./Images/Training_Images/"
-USE_CHECKPOINT = True
-IMAGE_SIZE = 615 # Row and column number 
-TO_PREDICT_PATH = "./Images/Prediction_Images/To_Predict/"
-PREDICTED_PATH = "./Images/Prediction_Images/Predicted_Images/"
-# PREDICTED_PATH = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_ANNOTATED_IMAGES = True
-SAVE_ORIGINAL_IMAGE = False
-SAVE_CROPPED_IMAGES = False
-DIE_SPACING_SCALE = 0.99
-MIN_SCORE = 0.6
+DATA_DIR                = "./Images/Training_Images/"
+USE_CHECKPOINT          = True
+IMAGE_SIZE              = 615 # Row and column number 
+TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
+PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
+# PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
+SAVE_ANNOTATED_IMAGES   = False
+SAVE_ORIGINAL_IMAGE     = True
+SAVE_CROPPED_IMAGES     = False
+DIE_SPACING_SCALE       = 0.99
+MIN_SCORE               = 0.75
 
 
 def time_convert(sec):
