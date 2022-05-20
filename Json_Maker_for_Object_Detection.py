@@ -10,7 +10,7 @@ import math
 import json
 
 # User Parameters/Constants to Set
-MATCH_CL = 0.65 # Minimum confidence level (CL) required to match golden-image to scanned image
+MATCH_CL = 0.80 # Minimum confidence level (CL) required to match golden-image to scanned image
 # STICHED_IMAGES_DIRECTORY = "//mcrtp-sftp-01/aoitool/LED-Test/Slot_01/"
 # GOLDEN_IMAGES_DIRECTORY = "C:/Users/ait.lab/.spyder-py3/Automated_AOI/Golden_Images/"
 STICHED_IMAGES_DIRECTORY = "Images/Stitched_Images/"
@@ -18,8 +18,9 @@ GOLDEN_IMAGES_DIRECTORY = "Images/Golden_Images/"
 SLEEP_TIME = 0.00 # Time to sleep in seconds between each window step
 SHOW_WINDOW = False
 PRINT_INFO = True
-SAVE_WAFERMAP = False
-NUMBER_TO_RUN = 50
+SAVE_WAFERMAP = True
+NUMBER_TO_RUN = 20
+NUMBER_DIE_PER_IMAGE = 30
 
 
 def time_convert(sec):
@@ -235,7 +236,7 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
                             print("  Die Number:", (die_index+1), "matchedCL:", round(matchedCL,3))
                     else: 
                         if die_index % 100 == 0:
-                            print(" ", die_index, "out of", (NUMBER_TO_RUN*100))
+                            print(" ", die_index, "out of", (NUMBER_TO_RUN*NUMBER_DIE_PER_IMAGE))
                     
                 # If the same die is saved twice, and the second one has better coordinates,
                 #  then below will replace the last data entry with the better data
@@ -255,13 +256,13 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
                     prev_x1 = x1
                     prev_matchedCL = matchedCL
                 
-    for i in range(100-box_count):
+    for i in range(NUMBER_DIE_PER_IMAGE-box_count):
         # JSON info
         die_index += 1
         die_ids.append(die_index)
         die_image_ids.append(image_ids[-1]) # image_id to place in annotations category
         category_id.append(1)
-        bboxes = np.append(bboxes, [[1000, 1000, 180, 180]], axis=0)
+        bboxes = np.append(bboxes, [[fullImage.shape[0]/2, fullImage.shape[0]/2, 33, 33]], axis=0)
         bbox_areas.append(32400)
         die_segmentations.append([])
         die_iscrowd.append(0)
@@ -280,9 +281,9 @@ for image_index, image_name in enumerate(os.listdir(STICHED_IMAGES_DIRECTORY)):
                 cv2.rectangle(fullImage_bboxes, 
                               (int(bboxes[index][0]), int(bboxes[index][1])), 
                               (int(bboxes[index][0] + bboxes[index][2]), 
-                               int(bboxes[index][1]) + bboxes[index][3]), 
+                               int(bboxes[index][1] + bboxes[index][3]) ), 
                               (255, 255, 255), 
-                              round(goldenImage.size * 0.00001))
+                              max(round(goldenImage.size * 0.00001),1))
         
         cv2.imwrite("./waferMap-{}.jpg".format(image_index), fullImage_bboxes)
 

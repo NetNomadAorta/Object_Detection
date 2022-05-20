@@ -19,20 +19,19 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/Window-OD-615.model"
-DATASET_PATH = "./Training_Data/Window/"
+SAVE_NAME_OD = "./Models-OD/TPv2-OD-834.model"
+DATASET_PATH = "./Training_Data/TPv2/"
 
 DATA_DIR                = "./Images/Training_Images/"
-USE_CHECKPOINT          = True
-IMAGE_SIZE              = 615 # Row and column number 
+IMAGE_SIZE              = 834 # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = False
-SAVE_ORIGINAL_IMAGE     = True
-SAVE_CROPPED_IMAGES     = False
+SAVE_ORIGINAL_IMAGE     = False
+SAVE_CROPPED_IMAGES     = True
 DIE_SPACING_SCALE       = 0.99
-MIN_SCORE               = 0.75
+MIN_SCORE               = 0.7
 
 
 def time_convert(sec):
@@ -129,7 +128,6 @@ model_1.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor
 # TESTING TO LOAD MODEL
 if os.path.isfile(SAVE_NAME_OD):
     checkpoint = torch.load(SAVE_NAME_OD)
-if USE_CHECKPOINT and os.path.isfile(SAVE_NAME_OD):
     model_1.load_state_dict(checkpoint)
 
 
@@ -141,7 +139,7 @@ torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
     A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-    # A.Rotate(limit=[90,90], always_apply=True),
+    A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
 
@@ -180,7 +178,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         predicted_image = draw_bounding_boxes(transformed_image,
             boxes = dieCoordinates,
             # labels = [classes_1[i] for i in die_class_indexes], 
-            labels = [str(round(i,2)) for i in die_scores], # SHOWS SCORE IN LABEL
+            # labels = [str(round(i,2)) for i in die_scores], # SHOWS SCORE IN LABEL
             width = line_width,
             colors = [color_list[i] for i in die_class_indexes]
             )
@@ -217,10 +215,11 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         die_spacing = 1 + round( (die_spacing_max/box_width)*DIE_SPACING_SCALE, 3)
         
         # Grabbing max and min x and y coordinate values
-        minX = int( torch.min(dieCoordinates[:, 0]) )
-        minY = int( torch.min(dieCoordinates[:, 1]) )
-        maxX = int( torch.max(dieCoordinates[:, 2]) )
-        maxY = int( torch.max(dieCoordinates[:, 3]) )
+        if len(dieCoordinates) > 0:
+            minX = int( torch.min(dieCoordinates[:, 0]) )
+            minY = int( torch.min(dieCoordinates[:, 1]) )
+            maxX = int( torch.max(dieCoordinates[:, 2]) )
+            maxY = int( torch.max(dieCoordinates[:, 3]) )
         
         dieNames = []
         

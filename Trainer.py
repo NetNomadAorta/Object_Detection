@@ -19,12 +19,12 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME      = "./Models-OD/Window-OD-615.model"
+SAVE_NAME      = "./Models-OD/TPv2-OD-834.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE     = 615       # Row and column number 2180
-DATASET_PATH   = "./Training_Data/Window/"
+IMAGE_SIZE     = 834       # Row and column number 2180
+DATASET_PATH   = "./Training_Data/TPv2/"
 NUMBER_EPOCH   = 1000
-LEARNING_RATE  = 0.001      # Default 0.01 -> 0.001
+LEARNING_RATE  = 0.01      # Default 0.01 -> 0.001
 BATCH_SIZE     = int(32*2) # Default int(32*2)
 
 # Transformation Parameters:
