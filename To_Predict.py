@@ -73,6 +73,7 @@ def replaceFileName(slot_path):
                           .replace("new_RefDes_1_PaveP1.", "")\
                           .replace("new_RefDes_1_Pave.", "")\
                           .replace("Window_Die1_Pave.", "")\
+                          .replace("TPV2_Pave.", "")\
                           .replace("Row_1.", "Row_01.")\
                           .replace("Col_1.", "Col_01.")\
                           .replace("Row_2.", "Row_02.")\
