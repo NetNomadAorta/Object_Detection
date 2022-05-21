@@ -19,8 +19,8 @@ SLEEP_TIME = 0.00 # Time to sleep in seconds between each window step
 SHOW_WINDOW = False
 PRINT_INFO = True
 SAVE_WAFERMAP = True
-NUMBER_TO_RUN = 20
-NUMBER_DIE_PER_IMAGE = 20
+NUMBER_TO_RUN = 15
+NUMBER_DIE_PER_IMAGE = 60
 
 
 def time_convert(sec):
