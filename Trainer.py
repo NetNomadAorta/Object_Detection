@@ -7,6 +7,7 @@ from torchvision import datasets, models
 from torch.utils.data import DataLoader
 import copy
 import math
+import re
 import cv2
 import albumentations as A  # our data augmentation library
 # remove warnings (optional)
@@ -21,8 +22,8 @@ from albumentations.pytorch import ToTensorV2
 # User parameters
 SAVE_NAME      = "./Models-OD/TPv2-OD-834.model"
 USE_CHECKPOINT = True
-IMAGE_SIZE     = 834       # Row and column number 2180
-DATASET_PATH   = "./Training_Data/TPv2/"
+IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column number 
+DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 NUMBER_EPOCH   = 1000
 LEARNING_RATE  = 0.01      # Default 0.01 -> 0.001
 BATCH_SIZE     = int(32*2) # Default int(32*2)

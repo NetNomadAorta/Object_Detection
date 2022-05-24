@@ -20,16 +20,14 @@ import shutil
 
 # User parameters
 SAVE_NAME_OD = "./Models-OD/TPv2-OD-834.model"
-DATASET_PATH = "./Training_Data/TPv2/"
-
-DATA_DIR                = "./Images/Training_Images/"
-IMAGE_SIZE              = 834 # Row and column number 
+DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
+IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_ANNOTATED_IMAGES   = True
+SAVE_ANNOTATED_IMAGES   = False
 SAVE_ORIGINAL_IMAGE     = False
-SAVE_CROPPED_IMAGES     = False
+SAVE_CROPPED_IMAGES     = True
 DIE_SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.6
 
@@ -74,6 +72,8 @@ def replaceFileName(slot_path):
                           .replace("new_RefDes_1_Pave.", "")\
                           .replace("Window_Die1_Pave.", "")\
                           .replace("TPV2_Pave.", "")\
+                          .replace("A-Unity_Pave.", "")\
+                          .replace("Window_", "")\
                           .replace("Row_1.", "Row_01.")\
                           .replace("Col_1.", "Col_01.")\
                           .replace("Row_2.", "Row_02.")\
@@ -94,7 +94,8 @@ def replaceFileName(slot_path):
                           .replace("Col_9.", "Col_09.")\
                           .replace(".p0", "")\
                           .replace(".p1", "")\
-                          .replace(".20",".P_")
+                          .replace(".20",".P_")\
+                          .replace(".21", "P_1")
                           )
 
 
@@ -197,23 +198,33 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         # Grabs row and column number from image name and corrects them
         path_row_number = int( re.findall(r'\d+', image_name)[0] )
         path_col_number = int( re.findall(r'\d+', image_name)[1] )
-        if path_row_number % 2 == 1:
-            path_row_number = (path_row_number + 1) // 2
-        else:
-            path_row_number = 20 + path_row_number // 2
         
-        if path_col_number % 2 == 1:
-            path_col_number = (path_col_number + 1) // 2
-        else:
-            path_col_number = 20 + path_col_number // 2  
+        if "SMiPE4" in SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0]:
+            if path_row_number % 2 == 1:
+                path_row_number = (path_row_number + 1) // 2
+            else:
+                path_row_number = 20 + path_row_number // 2
+            
+            if path_col_number % 2 == 1:
+                path_col_number = (path_col_number + 1) // 2
+            else:
+                path_col_number = 20 + path_col_number // 2  
+        elif "TPv2" in SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0]:
+            path_part_number = int( re.findall(r'\d+', image_name)[2] )
+            row_grouping = (10-path_part_number)%10
+            col_grouping = (path_part_number-1)//10
         
         if len(dieCoordinates) > 0:
             box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
             box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
         
         # # Sets spacing between dies
-        die_spacing_max = int(box_width * .1) # I guessed
-        die_spacing = 1 + round( (die_spacing_max/box_width)*DIE_SPACING_SCALE, 3)
+        if "SMiPE4" in SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0]:
+            die_spacing_max = int(box_width * .1) # I guessed
+            die_spacing = 1 + round( (die_spacing_max/box_width)*DIE_SPACING_SCALE, 3)
+        elif "TPv2" in SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0]:
+            die_spacing_max = int(box_width * 5) # I guessed
+            die_spacing = 1 + round( (die_spacing_max/box_width)*DIE_SPACING_SCALE, 3)
         
         # Grabbing max and min x and y coordinate values
         if len(dieCoordinates) > 0:
@@ -241,8 +252,12 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             colNumber = math.floor((x1-minX)/(box_height*die_spacing)+1)
             colNumber = str(colNumber)
             
-            real_rowNum = (path_row_number - 1)*10 + int(rowNumber)
-            real_colNum = (path_col_number - 1)*10 + int(colNumber)
+            if "SMiPE4" in SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0]:
+                real_rowNum = (path_row_number - 1)*10 + int(rowNumber)
+                real_colNum = (path_col_number - 1)*10 + int(colNumber)
+            elif "TPv2" in SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0]:
+                real_rowNum = (path_row_number - 1)*40 + row_grouping*4 + int(rowNumber)
+                real_colNum = (path_col_number - 1)*40 + col_grouping*4 + int(colNumber)
             
             # THIS PART IS FOR LED 160,000 WAFER!
             if int(real_colNum)>200:

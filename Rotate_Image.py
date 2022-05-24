@@ -6,6 +6,7 @@ import time
 import numpy as np
 import math
 import json
+import shutil
 
 
 # User Parameters/Constants to Set
@@ -24,6 +25,17 @@ def time_convert(sec):
     print("Time Lapsed = {0}h:{1}m:{2}s".format(int(hours), int(mins), round(sec) ) )
 
 
+def deleteDirContents(dir):
+    # Deletes photos in path "dir"
+    # # Used for deleting previous cropped photos from last run
+    for f in os.listdir(dir):
+        full_path = os.path.join(dir, f)
+        if os.path.isdir(full_path):
+            shutil.rmtree(full_path)
+        else:
+            os.remove(full_path)
+
+
 
 # MAIN():
 # =============================================================================
@@ -32,6 +44,9 @@ start_time = time.time()
 
 # Clears some of the screen for asthetics
 print("\n\n\n\n\n\n\n\n\n\n\n\n\n")
+
+# Deletes images already in "Predicted_Images" folder
+deleteDirContents(SAVE_IMAGES_DIRECTORY)
 
 
 for image_index, image_name in enumerate(os.listdir(IMAGES_TO_FLIP_DIRECTORY)):
