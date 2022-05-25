@@ -25,10 +25,9 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/TPv2-OD-834.model"
+SAVE_NAME_OD = "./Models-OD/Preferences-500.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 
-DATA_DIR                = "./Images/Training_Images/"
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
@@ -37,7 +36,7 @@ SAVE_ANNOTATED_IMAGES   = True
 SAVE_CROPPED_IMAGES     = False
 MIN_SCORE               = 0.6
 NUMBER_TO_RUN = 100
-NUMBER_DIE_PER_IMAGE = 16
+NUMBER_DIE_PER_IMAGE = 0
 
 
 def time_convert(sec):
