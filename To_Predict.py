@@ -19,7 +19,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/TPv2-OD-834.model"
+SAVE_NAME_OD = "./Models-OD/Window-OD-615.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
@@ -127,13 +127,18 @@ in_features = model_1.roi_heads.box_predictor.cls_score.in_features # we need to
 model_1.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes_1)
 
 
-# TESTING TO LOAD MODEL
+# Loads last saved checkpoint
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+if torch.cuda.is_available():
+    map_location=lambda storage, loc: storage.cuda()
+else:
+    map_location='cpu'
+
 if os.path.isfile(SAVE_NAME_OD):
-    checkpoint = torch.load(SAVE_NAME_OD)
+    checkpoint = torch.load(SAVE_NAME_OD, map_location=map_location)
     model_1.load_state_dict(checkpoint)
 
-
-device = torch.device("cuda") # use GPU to train
 model_1 = model_1.to(device)
 
 model_1.eval()
