@@ -20,12 +20,12 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME      = "./Models-OD/Window_Edge_Finder-OD-2492.model"
+SAVE_NAME      = "./Models-OD/Window_Edge_Finder-OD-1000.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column number 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 NUMBER_EPOCH   = 1000
-LEARNING_RATE  = 0.01      # Default 0.01 -> 0.001
+LEARNING_RATE  = 0.001      # Default 0.01 -> 0.001
 BATCH_SIZE     = int(32*2) # Default int(32*2)
 
 # Transformation Parameters:
@@ -33,7 +33,7 @@ BLUR_PROB           = 0.05  # Default: 0.05
 DOWNSCALE_PROB      = 0.10  # Default: 0.20 
 NOISE_PROB          = 0.05  # Default: 0.05 
 MOTION_BLUR_PROB    = 0.05  # Default: 0.05
-ROTATION            = 5     # Default: 5->7
+ROTATION            = 1     # Default: 5->7
 BRIGHTNESS_CHANGE   = 0.10  # Default: 0.10
 CONTRAST_CHANGE     = 0.05  # Default: 0.05
 SATURATION_CHANGE   = 0.05  # Default: 0.05
