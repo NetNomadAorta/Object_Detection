@@ -28,9 +28,9 @@ DATASET_PATH_2 = "./Training_Data/" + SAVE_NAME_OD_2.split("./Models-OD/",1)[1].
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_ANNOTATED_IMAGES   = True
+SAVE_ANNOTATED_IMAGES   = False
 SAVE_ORIGINAL_IMAGE     = False
-SAVE_CROPPED_IMAGES     = False
+SAVE_CROPPED_IMAGES     = True
 DIE_SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.8
 
@@ -202,192 +202,195 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     # BELOW SHOWS SCORES - COMMENT OUT IF NEEDED
     die_scores = pred_1['scores'][pred_1['scores'] > MIN_SCORE].tolist()
     
-    if SAVE_ANNOTATED_IMAGES:
-        predicted_image = draw_bounding_boxes(transformed_image,
-            boxes = dieCoordinates,
-            # labels = [classes_1[i] for i in die_class_indexes], 
-            # labels = [str(round(i,2)) for i in die_scores], # SHOWS SCORE IN LABEL
-            width = line_width,
-            colors = 'magenta'
-            )
+    predicted_image = draw_bounding_boxes(transformed_image,
+        boxes = dieCoordinates,
+        # labels = [classes_1[i] for i in die_class_indexes], 
+        # labels = [str(round(i,2)) for i in die_scores], # SHOWS SCORE IN LABEL
+        width = line_width,
+        colors = 'magenta'
+        )
+    
+    # ADDED FOR WINDOW
+    # =========================================================================
+    # Marks coordinates of edges of window dies
+    horz_edge_found = False
+    vert_edge_found = False
+    for die_coordinate in dieCoordinates:
+        # Finds horizontal edge
+        if ( (die_coordinate[2] - die_coordinate[0]) > 500 
+            and horz_edge_found == False):
+            horz_edge_found = True
+            horz_edge_x1 = die_coordinate[0]
+            horz_edge_y1 = die_coordinate[1]
+            horz_edge_x2 = die_coordinate[2]
+            horz_edge_y2 = die_coordinate[3]
+            if horz_edge_y1 < 500:
+                horz_edge_side = "Top"
+            else:
+                horz_edge_side = "Bottom"
+        # Finds verticle edge
+        if ( (die_coordinate[3] - die_coordinate[1]) > 500 
+            and vert_edge_found == False):
+            vert_edge_found = True
+            vert_edge_x1 = die_coordinate[0]
+            vert_edge_y1 = die_coordinate[1]
+            vert_edge_x2 = die_coordinate[2]
+            vert_edge_y2 = die_coordinate[3]
+            if vert_edge_x1 < 500:
+                vert_edge_side = "Left"
+            else:
+                vert_edge_side = "Right"
+    
+    if horz_edge_found:
+        if horz_edge_side == "Top":
+            horz_edge_cutoff_y = horz_edge_y2 + 180
+            predicted_image[:,
+                            :int(horz_edge_cutoff_y)] = ( 
+                (predicted_image[:,
+                                 :int(horz_edge_cutoff_y)]/2).type(torch.uint8) )
+        else: 
+            horz_edge_cutoff_y = horz_edge_y1 - 60
+            predicted_image[:,
+                            int(horz_edge_cutoff_y):] = ( 
+                (predicted_image[:,
+                                 int(horz_edge_cutoff_y):]/2).type(torch.uint8) )
+    if vert_edge_found:
+        if not horz_edge_found:
+            horz_edge_cutoff_y = 0
         
-        # ADDED FOR WINDOW
-        # =========================================================================
-        # Marks coordinates of edges of window dies
-        horz_edge_found = False
-        vert_edge_found = False
-        for die_coordinate in dieCoordinates:
-            # Finds horizontal edge
-            if ( (die_coordinate[2] - die_coordinate[0]) > 500 
-                and horz_edge_found == False):
-                horz_edge_found = True
-                horz_edge_x1 = die_coordinate[0]
-                horz_edge_y1 = die_coordinate[1]
-                horz_edge_x2 = die_coordinate[2]
-                horz_edge_y2 = die_coordinate[3]
-                if horz_edge_y1 < 500:
-                    horz_edge_side = "Top"
-                else:
-                    horz_edge_side = "Bottom"
-            # Finds verticle edge
-            if ( (die_coordinate[3] - die_coordinate[1]) > 500 
-                and vert_edge_found == False):
-                vert_edge_found = True
-                vert_edge_x1 = die_coordinate[0]
-                vert_edge_y1 = die_coordinate[1]
-                vert_edge_x2 = die_coordinate[2]
-                vert_edge_y2 = die_coordinate[3]
-                if vert_edge_x1 < 500:
-                    vert_edge_side = "Left"
-                else:
-                    vert_edge_side = "Right"
-        
-        if horz_edge_found:
-            if horz_edge_side == "Top":
-                horz_edge_cutoff_y = horz_edge_y2 + 180
+        if vert_edge_side == "Left":
+            vert_edge_cutoff_x = vert_edge_x2 + 180
+            if horz_edge_found and horz_edge_side == "Bottom":
                 predicted_image[:,
-                                :int(horz_edge_cutoff_y)] = ( 
+                                :int(horz_edge_cutoff_y),
+                                :int(vert_edge_cutoff_x)] = ( 
                     (predicted_image[:,
-                                     :int(horz_edge_cutoff_y)]/2).type(torch.uint8) )
-            else: 
-                horz_edge_cutoff_y = horz_edge_y1 - 60
+                                     :int(horz_edge_cutoff_y),
+                                     :int(vert_edge_cutoff_x)]/2).type(torch.uint8) )
+            else:
                 predicted_image[:,
-                                int(horz_edge_cutoff_y):] = ( 
+                                int(horz_edge_cutoff_y):,
+                                :int(vert_edge_cutoff_x)] = ( 
                     (predicted_image[:,
-                                     int(horz_edge_cutoff_y):]/2).type(torch.uint8) )
-        if vert_edge_found:
-            if not horz_edge_found:
-                horz_edge_cutoff_y = 0
+                                     int(horz_edge_cutoff_y):,
+                                     :int(vert_edge_cutoff_x)]/2).type(torch.uint8) )
+        else: 
+            vert_edge_cutoff_x = vert_edge_x1 - 520
+            if horz_edge_found and horz_edge_side == "Bottom":
+                predicted_image[:,
+                                :int(horz_edge_cutoff_y),
+                                int(vert_edge_cutoff_x):] = ( 
+                    (predicted_image[:,
+                                     :int(horz_edge_cutoff_y),
+                                     int(vert_edge_cutoff_x):]/2).type(torch.uint8) )
+            else:
+                predicted_image[:,
+                                int(horz_edge_cutoff_y):,
+                                int(vert_edge_cutoff_x):] = ( 
+                    (predicted_image[:,
+                                     int(horz_edge_cutoff_y):,
+                                     int(vert_edge_cutoff_x):]/2).type(torch.uint8) )
+    
+    # save_image((predicted_image/255), "test.jpg")
+    
+    # Inspection part
+    # --------------------------------------------------------------------
+    # What to predict
+    if horz_edge_found:
+        if horz_edge_side == "Top":
+            horz_edge_cutoff_y = horz_edge_y2 + 180
+            inspect_image = predicted_image[:, int(horz_edge_cutoff_y):]
+        else:
+            horz_edge_cutoff_y = horz_edge_y1 - 60
+            inspect_image = predicted_image[:, :int(horz_edge_cutoff_y)]
+    if vert_edge_found:
+        if vert_edge_side == "Left":
+            vert_edge_cutoff_x = vert_edge_x2 + 180
+            if horz_edge_found:
+                inspect_image = inspect_image[:, :, int(vert_edge_cutoff_x):]
+            else:
+                inspect_image = predicted_image[:, :, int(vert_edge_cutoff_x):]
+        else:
+            vert_edge_cutoff_x = vert_edge_x1 - 520
+            if horz_edge_found:
+                inspect_image = inspect_image[:, :, :int(vert_edge_cutoff_x)]
+            else:
+                inspect_image = predicted_image[:, :, :int(vert_edge_cutoff_x)]
+    
+    # SAVE
+    if SAVE_CROPPED_IMAGES:
+        save_image((inspect_image/255), 
+                   PREDICTED_PATH + image_name[:-4]+"-ORIGINAL.jpg")
+    
+    with torch.no_grad():
+        prediction_2 = model_2([(inspect_image/255).to(device)])
+        pred_2 = prediction_2[0]
+    
+    dieCoordinates_2 = pred_2['boxes'][pred_2['scores'] > MIN_SCORE]
+    die_class_indexes_2 = pred_2['labels'][pred_2['scores'] > MIN_SCORE].tolist()
+    # BELOW SHOWS SCORES - COMMENT OUT IF NEEDED
+    die_scores_2 = pred_2['scores'][pred_2['scores'] > MIN_SCORE].tolist()
+    
+    inspect_image_bb = draw_bounding_boxes(inspect_image,
+        boxes = dieCoordinates_2,
+        # labels = [classes_2[i] for i in die_class_indexes_2], 
+        # labels = [str(round(i,2)) for i in die_scores_2], # SHOWS SCORE IN LABEL
+        width = line_width,
+        colors = [color_list[i] for i in die_class_indexes_2]
+        )
+    # --------------------------------------------------------------------
+    
+    # Combining inspection section to main image
+    if vert_edge_found:
+        if vert_edge_side == "Left":
+            vert_edge_cutoff_x = vert_edge_x2 + 180
             
-            if vert_edge_side == "Left":
-                vert_edge_cutoff_x = vert_edge_x2 + 180
-                if horz_edge_found and horz_edge_side == "Bottom":
-                    predicted_image[:,
-                                    :int(horz_edge_cutoff_y),
-                                    :int(vert_edge_cutoff_x)] = ( 
-                        (predicted_image[:,
-                                         :int(horz_edge_cutoff_y),
-                                         :int(vert_edge_cutoff_x)]/2).type(torch.uint8) )
-                else:
-                    predicted_image[:,
-                                    int(horz_edge_cutoff_y):,
-                                    :int(vert_edge_cutoff_x)] = ( 
-                        (predicted_image[:,
-                                         int(horz_edge_cutoff_y):,
-                                         :int(vert_edge_cutoff_x)]/2).type(torch.uint8) )
-            else: 
-                vert_edge_cutoff_x = vert_edge_x1 - 520
-                if horz_edge_found and horz_edge_side == "Bottom":
-                    predicted_image[:,
-                                    :int(horz_edge_cutoff_y),
-                                    int(vert_edge_cutoff_x):] = ( 
-                        (predicted_image[:,
-                                         :int(horz_edge_cutoff_y),
-                                         int(vert_edge_cutoff_x):]/2).type(torch.uint8) )
-                else:
-                    predicted_image[:,
-                                    int(horz_edge_cutoff_y):,
-                                    int(vert_edge_cutoff_x):] = ( 
-                        (predicted_image[:,
-                                         int(horz_edge_cutoff_y):,
-                                         int(vert_edge_cutoff_x):]/2).type(torch.uint8) )
-        
-        # save_image((predicted_image/255), "test.jpg")
-        
-        # Inspection part
-        # --------------------------------------------------------------------
-        # What to predict
-        if horz_edge_found:
-            if horz_edge_side == "Top":
-                horz_edge_cutoff_y = horz_edge_y2 + 180
-                inspect_image = predicted_image[:, int(horz_edge_cutoff_y):]
-            else:
-                horz_edge_cutoff_y = horz_edge_y1 - 60
-                inspect_image = predicted_image[:, :int(horz_edge_cutoff_y)]
-        if vert_edge_found:
-            if vert_edge_side == "Left":
-                vert_edge_cutoff_x = vert_edge_x2 + 180
-                if horz_edge_found:
-                    inspect_image = inspect_image[:, :, int(vert_edge_cutoff_x):]
-                else:
-                    inspect_image = predicted_image[:, :, int(vert_edge_cutoff_x):]
-            else:
-                vert_edge_cutoff_x = vert_edge_x1 - 520
-                if horz_edge_found:
-                    inspect_image = inspect_image[:, :, :int(vert_edge_cutoff_x)]
-                else:
-                    inspect_image = predicted_image[:, :, :int(vert_edge_cutoff_x)]
-        
-        
-        with torch.no_grad():
-            prediction_2 = model_2([(inspect_image/255).to(device)])
-            pred_2 = prediction_2[0]
-        
-        dieCoordinates_2 = pred_2['boxes'][pred_2['scores'] > MIN_SCORE]
-        die_class_indexes_2 = pred_2['labels'][pred_2['scores'] > MIN_SCORE].tolist()
-        # BELOW SHOWS SCORES - COMMENT OUT IF NEEDED
-        die_scores_2 = pred_2['scores'][pred_2['scores'] > MIN_SCORE].tolist()
-        
-        inspect_image_bb = draw_bounding_boxes(inspect_image,
-            boxes = dieCoordinates_2,
-            # labels = [classes_2[i] for i in die_class_indexes_2], 
-            # labels = [str(round(i,2)) for i in die_scores_2], # SHOWS SCORE IN LABEL
-            width = line_width,
-            colors = [color_list[i] for i in die_class_indexes_2]
-            )
-        # --------------------------------------------------------------------
-        
-        # Combining inspection section to main image
-        if vert_edge_found:
-            if vert_edge_side == "Left":
-                vert_edge_cutoff_x = vert_edge_x2 + 180
+            if horz_edge_found:
+                if horz_edge_side == "Top":
+                    horz_edge_cutoff_y = horz_edge_y2 + 180
                 
-                if horz_edge_found:
-                    if horz_edge_side == "Top":
-                        horz_edge_cutoff_y = horz_edge_y2 + 180
-                    
-                        predicted_image[:, 
-                                        int(horz_edge_cutoff_y):, 
-                                        int(vert_edge_cutoff_x):] = inspect_image_bb
-                    else:
-                        horz_edge_cutoff_y = horz_edge_y1 - 60
-                    
-                        predicted_image[:, 
-                                        :int(horz_edge_cutoff_y), 
-                                        int(vert_edge_cutoff_x):] = inspect_image_bb
-                else:
                     predicted_image[:, 
-                                    :, 
+                                    int(horz_edge_cutoff_y):, 
+                                    int(vert_edge_cutoff_x):] = inspect_image_bb
+                else:
+                    horz_edge_cutoff_y = horz_edge_y1 - 60
+                
+                    predicted_image[:, 
+                                    :int(horz_edge_cutoff_y), 
                                     int(vert_edge_cutoff_x):] = inspect_image_bb
             else:
-                vert_edge_cutoff_x = vert_edge_x1 - 520
+                predicted_image[:, 
+                                :, 
+                                int(vert_edge_cutoff_x):] = inspect_image_bb
+        else:
+            vert_edge_cutoff_x = vert_edge_x1 - 520
+            
+            if horz_edge_found:
+                if horz_edge_side == "Top":
+                    horz_edge_cutoff_y = horz_edge_y2 + 180
                 
-                if horz_edge_found:
-                    if horz_edge_side == "Top":
-                        horz_edge_cutoff_y = horz_edge_y2 + 180
-                    
-                        predicted_image[:, 
-                                        int(horz_edge_cutoff_y):, 
-                                        :int(vert_edge_cutoff_x)] = inspect_image_bb
-                    else:
-                        horz_edge_cutoff_y = horz_edge_y1 - 60
-                    
-                        predicted_image[:, 
-                                        :int(horz_edge_cutoff_y), 
-                                        :int(vert_edge_cutoff_x)] = inspect_image_bb
-                else:
                     predicted_image[:, 
-                                    :, 
+                                    int(horz_edge_cutoff_y):, 
                                     :int(vert_edge_cutoff_x)] = inspect_image_bb
-        
-        
-        # =========================================================================
-        
-        # Saves full image with bounding boxes
-        if len(die_class_indexes_2) != 0:
-            save_image((predicted_image/255), PREDICTED_PATH + image_name)
-        
-        # save_image((predicted_image/255), PREDICTED_PATH + image_name)
+                else:
+                    horz_edge_cutoff_y = horz_edge_y1 - 60
+                
+                    predicted_image[:, 
+                                    :int(horz_edge_cutoff_y), 
+                                    :int(vert_edge_cutoff_x)] = inspect_image_bb
+            else:
+                predicted_image[:, 
+                                :, 
+                                :int(vert_edge_cutoff_x)] = inspect_image_bb
+    
+    
+    # =========================================================================
+    
+    # Saves full image with bounding boxes
+    if SAVE_ANNOTATED_IMAGES and len(die_class_indexes_2) != 0:
+        save_image((predicted_image/255), PREDICTED_PATH + image_name)
+    
+    # save_image((predicted_image/255), PREDICTED_PATH + image_name)
         
     if SAVE_ORIGINAL_IMAGE and len(die_class_indexes) != 0:
         cv2.imwrite(PREDICTED_PATH + image_name + "Original.jpg", orig_image)
