@@ -34,8 +34,8 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 SAVE_CROPPED_IMAGES     = False
-MIN_SCORE               = 0.6
-NUMBER_TO_RUN = 100
+MIN_SCORE               = 0.7
+NUMBER_TO_RUN = 223
 NUMBER_DIE_PER_IMAGE = 0
 
 
@@ -102,8 +102,8 @@ model_1.eval()
 torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
-    A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-    A.Rotate(limit=[90,90], always_apply=True),
+    # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
+    # A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
 
@@ -170,7 +170,7 @@ for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
     if SAVE_ANNOTATED_IMAGES:
         predicted_image = draw_bounding_boxes(transformed_image,
             boxes = dieCoordinates,
-            # labels = [classes_1[i] for i in die_class_indexes], 
+            labels = labels_found, 
             # labels = [str(round(i,2)) for i in die_scores], # SHOWS SCORE IN LABEL
             width = line_width,
             colors = [color_list[i] for i in die_class_indexes]
@@ -210,7 +210,7 @@ for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
         die_index += 1
         die_ids.append(die_index)
         die_image_ids.append(image_ids[-1]) # image_id to place in annotations category
-        category_id.append(1)
+        category_id.append(die_class_indexes[box_index])
         if die_index == 0:
             bboxes[-1] = np.array([x1, y1, bbox_width, bbox_height], ndmin=2)
         else:
@@ -274,6 +274,16 @@ data = {
         {
             "id": 1,
             "name": str(classes_1[1]),
+            "supercategory": str(classes_1[0])
+        },
+        {
+            "id": 2,
+            "name": "Nope",
+            "supercategory": str(classes_1[0])
+        },
+        {
+            "id": 3,
+            "name": "Sure",
             "supercategory": str(classes_1[0])
         }
     ]
