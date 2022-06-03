@@ -24,7 +24,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/Window-OD-615.model"
+SAVE_NAME_OD = "./Models-OD/Window_Tightness-0.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
@@ -34,7 +34,7 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 SAVE_CROPPED_IMAGES     = False
 MIN_SCORE               = 0.6
-NUMBER_TO_RUN = 10
+NUMBER_TO_RUN = 100
 NUMBER_DIE_PER_IMAGE = 0
 
 
