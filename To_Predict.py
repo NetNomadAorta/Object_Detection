@@ -291,9 +291,11 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             real_image_name = "R_{}.C_{}.jpg".format(real_rowNum, real_colNum)
             save_image(transformed_image[:, ymin:ymax, xmin:xmax]/255, 
                         PREDICTED_PATH + real_image_name)
-
-    if len(os.listdir(TO_PREDICT_PATH)) > 1000:
+    
+    if len(os.listdir(TO_PREDICT_PATH)) > 2000:
         tenScale = 1000
+    elif len(os.listdir(TO_PREDICT_PATH)) > 1000:
+        tenScale = 500
     else:
         tenScale = 100
 
