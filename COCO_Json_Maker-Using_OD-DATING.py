@@ -35,7 +35,7 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 SAVE_CROPPED_IMAGES     = False
 MIN_SCORE               = 0.7
-NUMBER_TO_RUN = 223
+NUMBER_TO_RUN = 331
 NUMBER_DIE_PER_IMAGE = 0
 
 
