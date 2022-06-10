@@ -20,12 +20,12 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME      = "./Models-OD/E_Electrode-OD-703.model"
+SAVE_NAME      = "./Models-OD/Window_Tightness-0.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column number 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 NUMBER_EPOCH   = 1000
-LEARNING_RATE  = 0.0005    # Default: Home_PC: 0.01;        Work_PC: 0.0005
+LEARNING_RATE  = 0.001    # Default: Home_PC: 0.01;        Work_PC: 0.0005
 BATCH_SIZE     = int(32/2) # Default: Home_PC: int(32*2);   Work_PC: int(32/2)
 
 # Transformation Parameters:
@@ -72,7 +72,7 @@ def get_transforms(train=False):
         ], bbox_params = A.BboxParams(format = 'coco') )
     else:
         transform = A.Compose([
-            A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
+            # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
             # A.Rotate(limit=[90,90], always_apply=True),
             ToTensorV2()
         ], bbox_params = A.BboxParams(format = 'coco') )
