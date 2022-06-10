@@ -25,7 +25,7 @@ USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column number 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 NUMBER_EPOCH   = 1000
-LEARNING_RATE  = 0.0001    # Default: Home_PC: 0.01;        Work_PC: 0.0005
+LEARNING_RATE  = 0.0005    # Default: Home_PC: 0.01;        Work_PC: 0.0005
 BATCH_SIZE     = int(32/2) # Default: Home_PC: int(32*2);   Work_PC: int(32/2)
 
 # Transformation Parameters:
