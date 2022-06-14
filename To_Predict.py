@@ -31,7 +31,7 @@ SAVE_ANNOTATED_IMAGES   = False
 SAVE_ORIGINAL_IMAGE     = True
 SAVE_CROPPED_IMAGES     = False
 DIE_SPACING_SCALE       = 0.99
-MIN_SCORE               = 0.7
+MIN_SCORE               = 0.6
 
 
 def time_convert(sec):
