@@ -19,7 +19,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/Window_Tightness-0.model"
+SAVE_NAME_OD = "./Models-OD/E_Electrode-OD-703.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
@@ -31,7 +31,7 @@ SAVE_ANNOTATED_IMAGES   = False
 SAVE_ORIGINAL_IMAGE     = True
 SAVE_CROPPED_IMAGES     = False
 DIE_SPACING_SCALE       = 0.99
-MIN_SCORE               = 0.6
+MIN_SCORE               = 0.7
 
 
 def time_convert(sec):
@@ -147,7 +147,7 @@ model_1.eval()
 torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
-    # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
+    A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
     # A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
@@ -199,7 +199,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         # save_image((predicted_image/255), PREDICTED_PATH + image_name)
         
     if SAVE_ORIGINAL_IMAGE and len(die_class_indexes) != 0:
-        cv2.imwrite(PREDICTED_PATH + image_name + "Original.jpg", orig_image)
+        cv2.imwrite(PREDICTED_PATH + image_name.replace(".jpg","") + "-Original.jpg", orig_image)
     
     if SAVE_CROPPED_IMAGES:
         # Grabs row and column number from image name and corrects them
