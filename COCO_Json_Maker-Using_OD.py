@@ -1,6 +1,5 @@
 # Import the necessary packages
 import os
-import glob
 import cv2
 import time
 # TESTING SVD FROM NUMPY
@@ -9,7 +8,6 @@ import math
 import json
 import torch
 from torchvision import models
-import math
 import re
 import albumentations as A  # our data augmentation library
 # remove arnings (optional)
@@ -24,7 +22,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/Window_Edge_Finder-OD-1000.model"
+SAVE_NAME_OD = "./Models-OD/E_Electrode-OD-703.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
@@ -33,7 +31,7 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 SAVE_CROPPED_IMAGES     = False
-MIN_SCORE               = 0.8
+MIN_SCORE               = 0.7
 NUMBER_TO_RUN = 1000
 NUMBER_DIE_PER_IMAGE = 0
 
