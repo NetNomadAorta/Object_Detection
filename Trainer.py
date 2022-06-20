@@ -25,8 +25,11 @@ USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column number 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 NUMBER_EPOCH   = 1000
-LEARNING_RATE  = 0.0005    # Default: Home_PC: 0.01;        Work_PC: 0.0005
-BATCH_SIZE     = int(32/2) # Default: Home_PC: int(32*2);   Work_PC: int(32/2)
+SCALER         = 1
+# LEARNING_RATE  = 0.0005*SCALER  # Default: Home_PC: 0.01;        Work_PC: 0.0005
+# BATCH_SIZE     = int(16*SCALER) # Default: Home_PC: int(16*4);   Work_PC: int(16*1)
+LEARNING_RATE  = 0.0005
+BATCH_SIZE     = 4
 
 # Transformation Parameters:
 BLUR_PROB           = 0.05  # Default: 0.05 
@@ -167,7 +170,8 @@ train_dataset = Object_Detection(root=dataset_path, transforms=get_transforms(Tr
 
 
 # lets load the faster rcnn model
-model = models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True)
+model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+# model = models.detection.fasterrcnn_resnet50_fpn_v2(pretrained=True) # HOW TO MAKE THIS ONE EXIST
 in_features = model.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes)
 
@@ -271,9 +275,6 @@ for epoch in range(num_epochs):
         prev_saved_all_losses = all_losses
 
 
-# we will watch first epoich to ensure no errrors
-# while it is training, lets write code to see the models predictions. lets try again
-model.eval()
 torch.cuda.empty_cache()
 
 # # Saves model
