@@ -30,7 +30,7 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 SAVE_CROPPED_IMAGES     = False
-MIN_SCORE               = 0.7
+MIN_SCORE               = 0.8
 NUMBER_TO_RUN = 1000
 NUMBER_DIE_PER_IMAGE = 0
 
@@ -352,7 +352,7 @@ for die_index in die_ids:
         data["annotations"].append(to_update_with["annotations"])
 
 
-with open('_annotations.coco.json', 'w') as f:
+with open(TO_PREDICT_PATH+'_annotations.coco.json', 'w') as f:
     json.dump(data, f, indent=4)
 
 # ==================================================================================
