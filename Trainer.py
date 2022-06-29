@@ -20,7 +20,7 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME      = "./Models-OD/E_Electrode-OD-1406.model"
+SAVE_NAME      = "./Models-OD/A_Fabulous-OD-2200.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column number 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
@@ -57,10 +57,10 @@ def time_convert(sec):
 def get_transforms(train=False):
     if train:
         transform = A.Compose([
-            A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
+            # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
             # A.Rotate(limit=[90,90], always_apply=True),
             A.GaussianBlur(blur_limit = (3,5), p = BLUR_PROB),
-            A.Downscale(scale_min = 0.80, scale_max = 0.99, p = DOWNSCALE_PROB),
+            A.Downscale(scale_min = 0.50, scale_max = 0.99, p = DOWNSCALE_PROB),
             A.GaussNoise(var_limit = (1.0, 10.0), p = NOISE_PROB),
             A.MotionBlur(5, p = MOTION_BLUR_PROB),
             A.Rotate(limit = [-ROTATION,ROTATION]),

@@ -21,7 +21,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/E_Electrode-OD-1406.model"
+SAVE_NAME_OD = "./Models-OD/A_Fabulous-OD-2200.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
@@ -30,7 +30,7 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 SAVE_CROPPED_IMAGES     = False
-MIN_SCORE               = 0.8
+MIN_SCORE               = 0.5
 NUMBER_TO_RUN = 1000
 NUMBER_DIE_PER_IMAGE = 0
 
@@ -206,7 +206,7 @@ for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
         die_index += 1
         die_ids.append(die_index)
         die_image_ids.append(image_ids[-1]) # image_id to place in annotations category
-        category_id.append(1)
+        category_id.append(die_class_indexes[box_index])
         if die_index == 0:
             bboxes[-1] = np.array([x1, y1, bbox_width, bbox_height], ndmin=2)
         else:
@@ -271,7 +271,12 @@ data = {
             "id": 1,
             "name": str(classes_1[1]),
             "supercategory": str(classes_1[0])
-        }
+        }, # MAY NEED TO DELETE COMMA IF COMMENTING OUT BELOW
+        {
+            "id": 2,
+            "name": str(classes_1[2]),
+            "supercategory": str(classes_1[0])
+        } # MAY WANT TO GET RID OF ID 2 WITH COMMA ABOVE
     ]
 }
 

@@ -19,7 +19,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/E_Electrode-OD-1406.model"
+SAVE_NAME_OD = "./Models-OD/A_Fabulous-OD-2200.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
@@ -31,7 +31,7 @@ SAVE_ANNOTATED_IMAGES   = False
 SAVE_ORIGINAL_IMAGE     = True
 SAVE_CROPPED_IMAGES     = False
 DIE_SPACING_SCALE       = 0.99
-MIN_SCORE               = 0.8
+MIN_SCORE               = 0.5
 
 
 def time_convert(sec):
@@ -179,9 +179,17 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         pred_1 = prediction_1[0]
     
     dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
-    die_class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE].tolist()
+    die_class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE]
     # BELOW SHOWS SCORES - COMMENT OUT IF NEEDED
-    die_scores = pred_1['scores'][pred_1['scores'] > MIN_SCORE].tolist()
+    die_scores = pred_1['scores'][pred_1['scores'] > MIN_SCORE]
+    
+    # # DELETES NOT WANTED LABELS
+    # for index, class_index in enumerate(die_class_indexes):
+    #     if len(die_class_indexes) > 0:
+    #         dieCoordinates = dieCoordinates[die_class_indexes == 2]
+    #         die_scores = die_scores[die_class_indexes == 2]
+    #         die_class_indexes = die_class_indexes[die_class_indexes == 2]
+            
     
     if SAVE_ANNOTATED_IMAGES:
         predicted_image = draw_bounding_boxes(transformed_image,
