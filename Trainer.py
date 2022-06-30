@@ -33,7 +33,7 @@ BATCH_SIZE     = 4
 
 # Transformation Parameters:
 BLUR_PROB           = 0.05  # Default: 0.05 
-DOWNSCALE_PROB      = 0.10  # Default: 0.10 
+DOWNSCALE_PROB      = 0.20  # Default: 0.10 
 NOISE_PROB          = 0.05  # Default: 0.05 
 MOTION_BLUR_PROB    = 0.05  # Default: 0.05
 ROTATION            = 5     # Default: 5
@@ -60,7 +60,7 @@ def get_transforms(train=False):
             # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
             # A.Rotate(limit=[90,90], always_apply=True),
             A.GaussianBlur(blur_limit = (3,5), p = BLUR_PROB),
-            A.Downscale(scale_min = 0.50, scale_max = 0.99, p = DOWNSCALE_PROB),
+            A.Downscale(scale_min = 0.30, scale_max = 0.99, p = DOWNSCALE_PROB),
             A.GaussNoise(var_limit = (1.0, 10.0), p = NOISE_PROB),
             A.MotionBlur(5, p = MOTION_BLUR_PROB),
             A.Rotate(limit = [-ROTATION,ROTATION]),
@@ -269,7 +269,7 @@ for epoch in range(num_epochs):
     
     # Saves model
     if (obj_loss < prev_saved_obj_loss 
-        or all_losses < (prev_saved_all_losses*0.82) ):
+        or all_losses < (prev_saved_all_losses*0.85) ): # DEfault 0.82
         torch.save(model.state_dict(), SAVE_NAME)
         prev_saved_obj_loss = obj_loss
         prev_saved_all_losses = all_losses
