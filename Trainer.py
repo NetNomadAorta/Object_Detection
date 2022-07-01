@@ -20,7 +20,7 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME      = "./Models-OD/A_Fabulous-OD-2200.model"
+SAVE_NAME      = "./Models-OD/Lord_of_Models-0.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column number 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
@@ -28,12 +28,12 @@ NUMBER_EPOCH   = 1000
 SCALER         = 1
 # LEARNING_RATE  = 0.0005*SCALER  # Default: Home_PC: 0.01;        Work_PC: 0.0005
 # BATCH_SIZE     = int(16*SCALER) # Default: Home_PC: int(16*4);   Work_PC: int(16*1)
-LEARNING_RATE  = 0.0005
-BATCH_SIZE     = 4
+BATCH_SIZE     = 2
+LEARNING_RATE  = 0.0001*BATCH_SIZE
 
 # Transformation Parameters:
 BLUR_PROB           = 0.05  # Default: 0.05 
-DOWNSCALE_PROB      = 0.20  # Default: 0.10 
+DOWNSCALE_PROB      = 0.25  # Default: 0.10 
 NOISE_PROB          = 0.05  # Default: 0.05 
 MOTION_BLUR_PROB    = 0.05  # Default: 0.05
 ROTATION            = 5     # Default: 5
@@ -41,8 +41,8 @@ BRIGHTNESS_CHANGE   = 0.10  # Default: 0.10
 CONTRAST_CHANGE     = 0.05  # Default: 0.05
 SATURATION_CHANGE   = 0.05  # Default: 0.05
 HUE_CHANGE          = 0.05  # Default: 0.05
-HORIZ_FLIP_CHANCE   = 0.10  # Default: 0.10
-VERT_FLIP_CHANCE    = 0.10  # Default: 0.10
+HORIZ_FLIP_CHANCE   = 0.20  # Default: 0.10
+VERT_FLIP_CHANCE    = 0.20  # Default: 0.10
 
 
 
@@ -63,14 +63,15 @@ def get_transforms(train=False):
             A.Downscale(scale_min = 0.30, scale_max = 0.99, p = DOWNSCALE_PROB),
             A.GaussNoise(var_limit = (1.0, 10.0), p = NOISE_PROB),
             A.MotionBlur(5, p = MOTION_BLUR_PROB),
-            A.Rotate(limit = [-ROTATION,ROTATION]),
-            A.HorizontalFlip(p = HORIZ_FLIP_CHANCE),
-            A.VerticalFlip(p = VERT_FLIP_CHANCE),
             A.ColorJitter(brightness = BRIGHTNESS_CHANGE, 
                           contrast = CONTRAST_CHANGE, 
                           saturation = SATURATION_CHANGE, 
                           hue = HUE_CHANGE, 
                           p = 0.1),
+            A.HorizontalFlip(p = HORIZ_FLIP_CHANCE),
+            A.VerticalFlip(p = VERT_FLIP_CHANCE),
+            A.RandomRotate90(p = 0.2),
+            A.Rotate(limit = [-ROTATION, ROTATION]),
             ToTensorV2()
         ], bbox_params = A.BboxParams(format = 'coco') )
     else:

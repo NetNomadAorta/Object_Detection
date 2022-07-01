@@ -21,7 +21,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/A_Fabulous-OD-2200.model"
+SAVE_NAME_OD = "./Models-OD/Lord_of_Models-0.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
