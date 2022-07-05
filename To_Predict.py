@@ -19,7 +19,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/A_Fabulous-OD-2200.model"
+SAVE_NAME_OD = "./Models-OD/HBCOSA-OD-1168.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
@@ -27,8 +27,8 @@ TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH          = "//mcrtp-sftp-01/aoitool/SMiPE4-DAK-Cropped/XDCC00189G4/"    # USE FOR XDisplay LOTS!
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_ANNOTATED_IMAGES   = False
-SAVE_ORIGINAL_IMAGE     = True
+SAVE_ANNOTATED_IMAGES   = True
+SAVE_ORIGINAL_IMAGE     = False
 SAVE_CROPPED_IMAGES     = False
 DIE_SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.5

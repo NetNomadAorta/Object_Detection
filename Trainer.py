@@ -208,6 +208,7 @@ model = model.to(device)
 # Now, and optimizer
 params = [p for p in model.parameters() if p.requires_grad]
 optimizer = torch.optim.SGD(params, lr=LEARNING_RATE, momentum=0.9, nesterov=True, weight_decay=1e-4)
+# optimizer = torch.optim.AdamW(params, lr = 1e-4) # CHOOSE THIS ONE (AdamW) OR ABOVE (SGD)
 # lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[16, 22], gamma=0.1) # lr scheduler
 
 
