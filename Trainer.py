@@ -20,7 +20,7 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME      = "./Models-OD/Lord_of_Models-0.model"
+SAVE_NAME      = "./Models-OD/HBCOSA-OD-1168.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column number 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
@@ -245,7 +245,7 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
         
         
     all_losses_dict = pd.DataFrame(all_losses_dict) # for printing
-    print("Epoch {}, l: {:.2f}, l_class: {:.3f}, l_box: {:.3f}, l_rpn_box: {:.3f}, l_obj: {:.4f}".format(
+    print("Epoch {}, l: {:.3f}, l_class: {:.3f}, l_box: {:.3f}, l_rpn_box: {:.3f}, l_obj: {:.4f}".format(
         epoch, 
         np.mean(all_losses),
         all_losses_dict['loss_classifier'].mean(),
