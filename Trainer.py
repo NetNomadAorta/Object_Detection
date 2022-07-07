@@ -57,7 +57,7 @@ def time_convert(sec):
 def get_transforms(train=False):
     if train:
         transform = A.Compose([
-            # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
+            # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # I don't include anymore because OD models doesn't discriminate against size
             # A.Rotate(limit=[90,90], always_apply=True),
             A.GaussianBlur(blur_limit = (3,5), p = BLUR_PROB),
             A.Downscale(scale_min = 0.30, scale_max = 0.99, p = DOWNSCALE_PROB),
