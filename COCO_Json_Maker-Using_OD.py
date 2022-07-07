@@ -130,6 +130,9 @@ for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
     # TESTING - Only completes up to index (NUMBER_TO_RUN-1)
     if image_index == NUMBER_TO_RUN:
         break
+    if "_annotations.coco.json" in image_name:
+        continue
+    
     print("\n\nStarting", image_name, "Image Number:", (image_index+1), "\n")
     
     
