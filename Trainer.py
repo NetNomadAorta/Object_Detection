@@ -29,7 +29,7 @@ SCALER         = 1
 # LEARNING_RATE  = 0.0005*SCALER  # Default: Home_PC: 0.01;        Work_PC: 0.0005
 # BATCH_SIZE     = int(16*SCALER) # Default: Home_PC: int(16*4);   Work_PC: int(16*1)
 BATCH_SIZE     = 2
-LEARNING_RATE  = 0.0001*BATCH_SIZE
+LEARNING_RATE  = 0.00001*BATCH_SIZE # Default: Work_PC: 0.0001*BATCH_SIZE
 
 # Transformation Parameters:
 BLUR_PROB           = 0.05  # Default: 0.05 
