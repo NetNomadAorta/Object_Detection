@@ -279,6 +279,11 @@ data = {
             "id": 2,
             "name": str(classes_1[2]),
             "supercategory": str(classes_1[0])
+        }, # MAY WANT TO GET RID OF ID 2 WITH COMMA ABOVE
+        {
+            "id": 3,
+            "name": str(classes_1[3]),
+            "supercategory": str(classes_1[0])
         } # MAY WANT TO GET RID OF ID 2 WITH COMMA ABOVE
     ]
 }
