@@ -158,7 +158,7 @@ replaceFileName(TO_PREDICT_PATH)
 # Start FPS timer
 fps_start_time = time.time()
 
-color_list =['green', 'red', 'magenta', 'blue', 'orange', 'cyan', 'lime', 'turquoise', 'yellow']
+color_list =['green', 'red', 'blue', 'magenta', 'orange', 'cyan', 'lime', 'turquoise', 'yellow']
 pred_dict = {}
 ii = 0
 for image_name in os.listdir(TO_PREDICT_PATH):
