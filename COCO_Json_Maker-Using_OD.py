@@ -269,24 +269,24 @@ data = {
             "id": 0,
             "name": str(classes_1[0]),
             "supercategory": "none"
-        },
-        {
-            "id": 1,
-            "name": str(classes_1[1]),
-            "supercategory": str(classes_1[0])
-        }, # MAY NEED TO DELETE COMMA IF COMMENTING OUT BELOW
-        {
-            "id": 2,
-            "name": str(classes_1[2]),
-            "supercategory": str(classes_1[0])
-        }, # MAY WANT TO GET RID OF ID 2 WITH COMMA ABOVE
-        {
-            "id": 3,
-            "name": str(classes_1[3]),
-            "supercategory": str(classes_1[0])
-        } # MAY WANT TO GET RID OF ID 2 WITH COMMA ABOVE
+        }
     ]
 }
+
+
+
+# EXPERIMENTAL
+# Updates "categories" section for each class/label
+for label_index, label in enumerate(classes_1):
+    if label_index != 0:
+        to_update_with = {
+            "categories": {
+                "id": label_index,
+                "name": str(classes_1[label_index]),
+                "supercategory": str(classes_1[0])
+            }
+        }
+        data["categories"].append(to_update_with["categories"])
 
 
 
