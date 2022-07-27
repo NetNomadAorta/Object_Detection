@@ -271,7 +271,7 @@ for epoch in range(num_epochs):
     
     # Saves model
     if (obj_loss < prev_saved_obj_loss 
-        or all_losses < (prev_saved_all_losses*0.85) ): # DEfault 0.82
+        or all_losses < (prev_saved_all_losses*0.90) ): # DEfault 0.85
         torch.save(model.state_dict(), SAVE_NAME)
         prev_saved_obj_loss = obj_loss
         prev_saved_all_losses = all_losses
