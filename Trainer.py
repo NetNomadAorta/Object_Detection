@@ -196,7 +196,7 @@ output = model(images, targets) # just make sure this runs without error
 
 
 
-device = torch.device("cuda") # use GPU to train
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # use GPU to train
 
 
 
