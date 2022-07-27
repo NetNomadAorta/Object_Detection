@@ -31,7 +31,7 @@ SAVE_ANNOTATED_IMAGES   = True
 SAVE_ORIGINAL_IMAGE     = False
 SAVE_CROPPED_IMAGES     = False
 DIE_SPACING_SCALE       = 0.99
-MIN_SCORE               = 0.5
+MIN_SCORE               = 0.6
 
 
 def time_convert(sec):
@@ -148,7 +148,7 @@ model_1.eval()
 torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
-    A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
+    # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
     # A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
