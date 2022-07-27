@@ -27,8 +27,8 @@ TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH          = "//mcrtp-sftp-01/aoitool/SMiPE4-DAK-Cropped/XDCC00189G4/"    # USE FOR XDisplay LOTS!
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_ANNOTATED_IMAGES   = False
-SAVE_ORIGINAL_IMAGE     = True
+SAVE_ANNOTATED_IMAGES   = True
+SAVE_ORIGINAL_IMAGE     = False
 SAVE_CROPPED_IMAGES     = False
 DIE_SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.5
@@ -75,6 +75,7 @@ def replaceFileName(slot_path):
                           .replace("Window_Die1_Pave.", "")\
                           .replace("TPV2_Pave.", "")\
                           .replace("A-Unity_Pave.", "")\
+                          .replace("E-Merlin_Pave.", "")\
                           .replace("Window_", "")\
                           .replace("Row_1.", "Row_01.")\
                           .replace("Col_1.", "Col_01.")\
@@ -124,7 +125,7 @@ classes_1
 
 
 # lets load the faster rcnn model
-model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, box_detections_per_img=600)
+model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, box_detections_per_img=500)
 in_features = model_1.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model_1.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes_1)
 
