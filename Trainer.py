@@ -20,7 +20,7 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME      = "./Models-OD/SMiPE4-Multi_Label-1090.model"
+SAVE_NAME      = "./Models-OD/Lord_of_Models-0.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column size 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
@@ -262,16 +262,24 @@ def train_one_epoch(model, optimizer, loader, device, epoch):
 num_epochs = NUMBER_EPOCH
 prev_saved_all_losses = 100
 prev_saved_obj_loss = 100
+prev_saved_weighted_loss = 100
 
 for epoch in range(num_epochs):
     all_losses, obj_loss = train_one_epoch(model, optimizer, train_loader, device, epoch)
+    weighted_loss = all_losses + 9*obj_loss
     
-    # Saves model
-    if (obj_loss < prev_saved_obj_loss 
-        or all_losses < (prev_saved_all_losses*0.90) ): # DEfault 0.85
+    # Saves model - version 2 - can comment out if wanted
+    if weighted_loss < prev_saved_weighted_loss:
         torch.save(model.state_dict(), SAVE_NAME)
-        prev_saved_obj_loss = obj_loss
-        prev_saved_all_losses = all_losses
+        print("   Saved model!")
+        prev_saved_weighted_loss = weighted_loss
+    
+    # # Saves model
+    # if (obj_loss < prev_saved_obj_loss 
+    #     or all_losses < (prev_saved_all_losses*0.9) ): # DEfault 0.85
+    #     torch.save(model.state_dict(), SAVE_NAME)
+    #     prev_saved_obj_loss = obj_loss
+    #     prev_saved_all_losses = all_losses
 
 
 torch.cuda.empty_cache()
