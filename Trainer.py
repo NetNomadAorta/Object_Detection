@@ -24,9 +24,9 @@ SAVE_NAME      = "./Models-OD/Lord_of_Models-0.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column size 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
-NUMBER_EPOCH   = 1000
+NUMBER_EPOCH   = 10000
 BATCH_SIZE     = 2
-LEARNING_RATE  = 0.00001*BATCH_SIZE # Default: Work_PC: 0.0001*BATCH_SIZE
+LEARNING_RATE  = 0.001*BATCH_SIZE # Default: Work_PC: 0.0001*BATCH_SIZE
 
 # Transformation Parameters:
 BLUR_PROB           = 0.05  # Default: 0.05 
@@ -57,7 +57,7 @@ def get_transforms(train=False):
             # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # I don't include anymore because OD models doesn't discriminate against size
             # A.Rotate(limit=[90,90], always_apply=True),
             A.GaussianBlur(blur_limit = (3,5), p = BLUR_PROB),
-            A.Downscale(scale_min = 0.30, scale_max = 0.99, p = DOWNSCALE_PROB),
+            A.Downscale(scale_min = 0.40, scale_max = 0.99, p = DOWNSCALE_PROB),
             A.GaussNoise(var_limit = (1.0, 10.0), p = NOISE_PROB),
             A.MotionBlur(5, p = MOTION_BLUR_PROB),
             A.ColorJitter(brightness = BRIGHTNESS_CHANGE, 
