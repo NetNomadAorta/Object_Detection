@@ -1,7 +1,6 @@
 import os
 import torch
 from torchvision import models
-import math
 import re
 import cv2
 import albumentations as A  # our data augmentation library
@@ -276,12 +275,12 @@ for image_name in os.listdir(TO_PREDICT_PATH):
                 labels_found.append(" ")
             # Bottom bumps
             elif dieCoordinate[1] > 1700:
-                bump_number = int( (dieCoordinate[0] - 200)/225 + 1 )
+                bump_number = int( (dieCoordinate[0] - 190)/225 + 1 )
                 bump_number = str(bump_number)
                 labels_found.append(bump_number)
             # Top Bumps
             elif dieCoordinate[1] < 100:
-                bump_number = 32 - int( (dieCoordinate[0] - 200)/225 + 1 )
+                bump_number = 32 - int( (dieCoordinate[0] - 190)/225 + 1 )
                 bump_number = str(bump_number)
                 labels_found.append(bump_number)
             # Left Bumps
