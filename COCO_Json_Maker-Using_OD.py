@@ -154,7 +154,7 @@ for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
     image_widths.append(transformed_image.shape[2])
     
     if ii == 0:
-        line_width = round(transformed_image.shape[1] * 0.001) # Default 0.00214
+        line_width = max(round(transformed_image.shape[1] * 0.000), 1)
     
     with torch.no_grad():
         prediction_1 = model_1([(transformed_image/255).to(device)])
