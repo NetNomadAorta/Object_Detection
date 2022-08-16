@@ -271,8 +271,10 @@ for epoch in range(num_epochs):
     # Saves model - version 2 - can comment out if wanted
     if weighted_loss < prev_saved_weighted_loss:
         torch.save(model.state_dict(), SAVE_NAME)
-        print("   Saved model!")
+        print("   Saved model!\n")
         prev_saved_weighted_loss = weighted_loss
+        prev_saved_obj_loss = obj_loss # Not needed, but just curious
+        prev_saved_all_losses = all_losses # Not needed, but just curious
     
     # # Saves model
     # if (obj_loss < prev_saved_obj_loss 
