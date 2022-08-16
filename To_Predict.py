@@ -31,7 +31,7 @@ SAVE_ANNOTATED_IMAGES   = True
 SAVE_ORIGINAL_IMAGE     = False
 SAVE_CROPPED_IMAGES     = False
 DIE_SPACING_SCALE       = 0.99
-MIN_SCORE               = 0.5 # Default 0.5
+MIN_SCORE               = 0.6 # Default 0.5
 
 
 def time_convert(sec):
@@ -173,7 +173,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     transformed_image = transformed_image["image"]
     
     if ii == 0:
-        line_width = round(transformed_image.shape[1] * 0.00214)
+        line_width = max(round(transformed_image.shape[1] * 0.002), 1)
     
     with torch.no_grad():
         prediction_1 = model_1([(transformed_image/255).to(device)])
