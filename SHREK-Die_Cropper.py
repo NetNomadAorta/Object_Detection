@@ -372,14 +372,6 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     save_image(inspect_image_bb/255, 
                 PREDICTED_PATH + real_image_name)
     
-                
-    
-    
-    
-    
-    
-    
-    
     if len(os.listdir(TO_PREDICT_PATH)) > 2000:
         tenScale = 1000
     elif len(os.listdir(TO_PREDICT_PATH)) > 1000:

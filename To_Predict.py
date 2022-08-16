@@ -198,7 +198,9 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             # labels = [classes_1[i] for i in die_class_indexes], 
             # labels = [str(round(i,2)) for i in die_scores], # SHOWS SCORE IN LABEL
             width = line_width,
-            colors = [color_list[i] for i in die_class_indexes]
+            colors = [color_list[i] for i in die_class_indexes],
+            font = "arial.ttf",
+            font_size = 20
             )
         
         # Saves full image with bounding boxes
