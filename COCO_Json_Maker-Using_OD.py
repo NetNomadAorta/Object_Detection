@@ -21,7 +21,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/Lord_of_Models-0.model"
+SAVE_NAME_OD = "./Models-OD/SHREK_Die_Cropper-0.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
@@ -154,7 +154,7 @@ for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
     image_widths.append(transformed_image.shape[2])
     
     if ii == 0:
-        line_width = max(round(transformed_image.shape[1] * 0.001), 1)
+        line_width = max(round(transformed_image.shape[1] * 0.002), 1)
     
     with torch.no_grad():
         prediction_1 = model_1([(transformed_image/255).to(device)])
