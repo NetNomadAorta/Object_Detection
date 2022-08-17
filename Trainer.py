@@ -20,12 +20,12 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME      = "./Models-OD/SHREK_Die_Cropper-0.model"
+SAVE_NAME      = "./Models-OD/Lord_of_Models-0.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column size 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 NUMBER_EPOCH   = 10000
-BATCH_SIZE     = 4 # Default: Work_PC: 2
+BATCH_SIZE     = 2 # Default: Work_PC: 2
 LEARNING_RATE  = 0.001*BATCH_SIZE # Default: Work_PC: 0.001*BATCH_SIZE
 
 # Transformation Parameters:
