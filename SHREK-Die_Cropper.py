@@ -26,7 +26,7 @@ TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 MIN_SCORE_1             = 0.6 # Default 0.5
 MIN_SCORE_2             = 0.6
-MIC_PIX_SCALER          = 1.71
+MIC_PIX_SCALER          = 1.729
 
 
 def time_convert(sec):
@@ -123,32 +123,33 @@ workbook = xlsxwriter.Workbook(PREDICTED_PATH + 'Bump_Diameter_Measurements.xlsx
 worksheet = workbook.add_worksheet("Report")
 # Adds headers in worksheet
 worksheet.write(1-1, 1-1, 
-                "Row #"
+                "Row #",
+                workbook.add_format({'bold': True})
                 )
 worksheet.write(1-1, 2-1, 
-                "Col #"
+                "Col #",
+                workbook.add_format({'bold': True})
                 )
 worksheet.write(1-1, 3-1, 
-                "Bump #"
+                "Bump #",
+                workbook.add_format({'bold': True})
                 )
 worksheet.write(1-1, 4-1, 
-                "Diameter (μm)"
+                "Diameter (μm)",
+                workbook.add_format({'bold': True})
                 )
 red_background = workbook.add_format(
-    {'bold': True,
-     'font_color': 'white',
+    {'font_color': 'white',
      'bg_color': 'red'
      }
     )
 cyan_background = workbook.add_format(
-    {'bold': True,
-     'font_color': 'white',
+    {'font_color': 'black',
      'bg_color': 'cyan'
      }
     )
 blue_background = workbook.add_format(
-    {'bold': True,
-     'font_color': 'white',
+    {'font_color': 'white',
      'bg_color': 'blue'
      }
     )
@@ -353,8 +354,8 @@ for image_name in os.listdir(TO_PREDICT_PATH):
                         )
         
         worksheet.write_url(excel_row, 4-1, 
-                            ("C:/Users/troya/.spyder-py3/Object_Detection/" 
-                             + PREDICTED_PATH + real_image_name
+                            ("//mcrtp-file-01.mcusa.local/public/000-AOI_Tool_Output/A_SHREK-Bump_Measurements/"
+                             + real_image_name
                              )
                             )
         
@@ -363,7 +364,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
                             diameters_list[label_index],
                             red_background
                             )
-        elif diameters_list[label_index] < 205:
+        elif diameters_list[label_index] < 200:
             worksheet.write(excel_row, 4-1, 
                             diameters_list[label_index],
                             cyan_background
@@ -406,10 +407,10 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         fps_start_time = time.time()
 
 # Sets width of columns
-worksheet.set_column(0, 0, width=5.5)
-worksheet.set_column(1, 1, width=5.5)
+worksheet.set_column(0, 0, width=6)
+worksheet.set_column(1, 1, width=6)
 worksheet.set_column(2, 2, width=7)
-worksheet.set_column(3, 3, width=12.5)
+worksheet.set_column(3, 3, width=13.5)
 
 workbook.close()
 
