@@ -26,6 +26,7 @@ TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 MIN_SCORE_1             = 0.6 # Default 0.5
 MIN_SCORE_2             = 0.6
+MIC_PIX_SCALER          = 1.71
 
 
 def time_convert(sec):
@@ -137,6 +138,18 @@ red_background = workbook.add_format(
     {'bold': True,
      'font_color': 'white',
      'bg_color': 'red'
+     }
+    )
+cyan_background = workbook.add_format(
+    {'bold': True,
+     'font_color': 'white',
+     'bg_color': 'cyan'
+     }
+    )
+blue_background = workbook.add_format(
+    {'bold': True,
+     'font_color': 'white',
+     'bg_color': 'blue'
      }
     )
 
@@ -320,7 +333,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             continue
         diameter_x = dieCoordinate[2] - dieCoordinate[0]
         diameter_y = dieCoordinate[3] - dieCoordinate[1]
-        diameters_list.append( round(int( max(diameter_x, diameter_y) )*1.75) ) # 1.75 is the micron/pixel scale!
+        diameters_list.append( round(int( max(diameter_x, diameter_y) )*MIC_PIX_SCALER) ) # MIC_PIX_SCALER is the micron/pixel scale!
     
     
     # Writes data in Excel sheet
@@ -349,6 +362,11 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             worksheet.write(excel_row, 4-1, 
                             diameters_list[label_index],
                             red_background
+                            )
+        elif diameters_list[label_index] < 205:
+            worksheet.write(excel_row, 4-1, 
+                            diameters_list[label_index],
+                            cyan_background
                             )
         else:
             worksheet.write(excel_row, 4-1, 
