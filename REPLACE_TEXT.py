@@ -10,15 +10,20 @@ def time_convert(sec):
     print("Time Lapsed = {0}h:{1}m:{2}s".format(int(hours), int(mins), round(sec) ) )
 
 
+def progress_bar():
+    print("test")
+
+
 
 # Starting stopwatch to see how long process takes
 start_time = time.time()
 
-for x in range (0,5):  
-    b = "Loading" + "." * x
+for x in range (1,51):  
+    b = "[" + "=" * x + " "*(50-x) + "]"
     sys.stdout.write('\033[2K\033[1G')
     print (b, end="\r")
-    time.sleep(1)
+    time.sleep(0.1)
+
 # To make a new line so next print starts its own line
 print("")
 

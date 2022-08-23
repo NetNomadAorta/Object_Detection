@@ -1,4 +1,5 @@
 import os
+import sys
 import torch
 from torchvision import models
 import re
@@ -390,21 +391,18 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     save_image(inspect_image_bb/255, 
                 PREDICTED_PATH + real_image_name)
     
-    if len(os.listdir(TO_PREDICT_PATH)) > 2000:
-        tenScale = 1000
-    elif len(os.listdir(TO_PREDICT_PATH)) > 1000:
-        tenScale = 500
-    else:
-        tenScale = 100
-
+    ten_scale = int(len(os.listdir(TO_PREDICT_PATH))*0.01)
+    
     ii += 1
-    if ii % tenScale == 0:
+    if ii % ten_scale == 0:
         fps_end_time = time.time()
         fps_time_lapsed = fps_end_time - fps_start_time
-        print("  " + str(ii) + " of " 
-              + str(len(os.listdir(TO_PREDICT_PATH))), 
-              "-",  round(tenScale/fps_time_lapsed, 2), "FPS")
-        fps_start_time = time.time()
+        
+        sys.stdout.write('\033[2K\033[1G')
+        print("  " + str(round(ii/len(os.listdir(TO_PREDICT_PATH))*100) ) + "%",
+              "-",  round(ten_scale/fps_time_lapsed, 2), "FPS",
+              end="\r"
+              )
 
 # Sets width of columns
 worksheet.set_column(0, 0, width=6)

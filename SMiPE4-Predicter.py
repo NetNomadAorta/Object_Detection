@@ -1,10 +1,12 @@
 import os
+import sys
 import torch
 from torchvision import models
 import math
 from math import sqrt
 import re
 import cv2
+import glob
 import albumentations as A  # our data augmentation library
 # remove arnings (optional)
 import warnings
@@ -26,6 +28,7 @@ IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME_OD_1)[-1] ) # Row and column n
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 MIN_SCORE_1             = 0.65 # Default 0.5
+RENAME_TOGGLE           = False
 
 
 def time_convert(sec):
@@ -34,6 +37,53 @@ def time_convert(sec):
     hours = mins // 60
     mins = mins % 60
     print("Time Lapsed = {0}h:{1}m:{2}s".format(int(hours), int(mins), round(sec) ) )
+
+
+# Deletes unnecessary string in file name
+def replaceFileName(slot_path):
+    for filename in glob.glob(slot_path + "/*"):
+        # For loop with row number as "i" will take longer, so yes below seems
+        #   redundant writing each number 1 by 1, but has to be done.
+        os.rename(filename, 
+                  filename.replace("Stitcher-Snaps_for_8in_Wafer_Pave.", "")\
+                          .replace("Die-1_Pave.", "")\
+                          .replace("Die1_Pave.", "")\
+                          .replace("Med_El-A_River_1_Pave.", "")\
+                          .replace("new_RefDes_1_PaveP1.", "")\
+                          .replace("new_RefDes_1_Pave.", "")\
+                          .replace("Window_Die1_Pave.", "")\
+                          .replace("TPV2_Pave.", "")\
+                          .replace("A-Unity_Pave.", "")\
+                          .replace("E-Merlin_Pave.", "")\
+                          .replace("A-Fang_Pave.", "")\
+                          .replace("A-Soarin_Pave.", "")\
+                          .replace("A-B4001_Pave.", "")\
+                          .replace("A-RDSensor1_Pave.", "")\
+                          .replace("A-Vapor_ROC3_Pave.", "")\
+                          .replace("Window_", "")\
+                          .replace("Row_1.", "Row_01.")\
+                          .replace("Col_1.", "Col_01.")\
+                          .replace("Row_2.", "Row_02.")\
+                          .replace("Col_2.", "Col_02.")\
+                          .replace("Row_3.", "Row_03.")\
+                          .replace("Col_3.", "Col_03.")\
+                          .replace("Row_4.", "Row_04.")\
+                          .replace("Col_4.", "Col_04.")\
+                          .replace("Row_5.", "Row_05.")\
+                          .replace("Col_5.", "Col_05.")\
+                          .replace("Row_6.", "Row_06.")\
+                          .replace("Col_6.", "Col_06.")\
+                          .replace("Row_7.", "Row_07.")\
+                          .replace("Col_7.", "Col_07.")\
+                          .replace("Row_8.", "Row_08.")\
+                          .replace("Col_8.", "Col_08.")\
+                          .replace("Row_9.", "Row_09.")\
+                          .replace("Col_9.", "Col_09.")\
+                          .replace(".p0", "")\
+                          .replace(".p1", "")\
+                          .replace(".20",".P_")\
+                          .replace(".21", "P_1")
+                          )
 
 
 def deleteDirContents(dir):
@@ -132,6 +182,12 @@ bin_bold_colors_list.append(workbook.add_format(
     {'bold': True,
      'font_color': font_color_list[-1],
      'bg_color': bg_color_list[-1]}))
+
+# Removes unnecessary naming from original images
+if RENAME_TOGGLE:
+    print("  Renaming started.")
+    replaceFileName(TO_PREDICT_PATH)
+    print("  Renaming completed.")
 
 # Start FPS timer
 fps_start_time = time.time()
@@ -253,21 +309,18 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     
     save_image(predicted_image/255, PREDICTED_PATH + image_name + ".jpg")
     
-    if len(os.listdir(TO_PREDICT_PATH)) > 2000:
-        tenScale = 1000
-    elif len(os.listdir(TO_PREDICT_PATH)) > 1000:
-        tenScale = 500
-    else:
-        tenScale = 100
-
+    ten_scale = int(len(os.listdir(TO_PREDICT_PATH))*0.01)
+    
     ii += 1
-    if ii % tenScale == 0:
+    if ii % ten_scale == 0:
         fps_end_time = time.time()
         fps_time_lapsed = fps_end_time - fps_start_time
-        print("  " + str(ii) + " of " 
-              + str(len(os.listdir(TO_PREDICT_PATH))), 
-              "-",  round(tenScale/fps_time_lapsed, 2), "FPS")
-        fps_start_time = time.time()
+        
+        sys.stdout.write('\033[2K\033[1G')
+        print("  " + str(round(ii/len(os.listdir(TO_PREDICT_PATH))*100) ) + "%",
+              "-",  round(ten_scale/fps_time_lapsed, 2), "FPS",
+              end="\r"
+              )
     
     
 # XLS Section
