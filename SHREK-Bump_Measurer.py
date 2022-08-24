@@ -403,6 +403,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
               "-",  round(ten_scale/fps_time_lapsed, 2), "FPS",
               end="\r"
               )
+        fps_start_time = time.time()
 
 # Sets width of columns
 worksheet.set_column(0, 0, width=6)

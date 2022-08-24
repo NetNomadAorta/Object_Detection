@@ -1,4 +1,5 @@
 import os
+import sys
 import torch
 from torchvision import models
 import math
@@ -320,6 +321,22 @@ for image_name in os.listdir(TO_PREDICT_PATH):
               + str(len(os.listdir(TO_PREDICT_PATH))), 
               "-",  round(tenScale/fps_time_lapsed, 2), "FPS")
         fps_start_time = time.time()
+    
+    
+    ten_scale = int(len(os.listdir(TO_PREDICT_PATH))*0.01)
+    
+    ii += 1
+    if ii % ten_scale == 0:
+        fps_end_time = time.time()
+        fps_time_lapsed = fps_end_time - fps_start_time
+        
+        sys.stdout.write('\033[2K\033[1G')
+        print("  " + str(round(ii/len(os.listdir(TO_PREDICT_PATH))*100) ) + "%",
+              "-",  round(ten_scale/fps_time_lapsed, 2), "FPS",
+              end="\r"
+              )
+        fps_start_time = time.time()
+            
 
 
 print("Done!")
