@@ -86,7 +86,7 @@ n_classes_2 = len(categories_2.keys())
 classes_2 = [i[1]['name'] for i in categories_2.items()]
 
 # lets load the faster rcnn model
-model_2 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+model_2 = models.detection.models.detection.fasterrcnn_resnet50_fpn_v2(pretrained=True)
 in_features_2 = model_2.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model_2.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features_2, n_classes_2)
 
