@@ -25,7 +25,7 @@ USE_CHECKPOINT = True
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME)[-1] ) # Row and column size 
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 NUMBER_EPOCH   = 10000
-BATCH_SIZE     = 1 # Default: Work_PC: 2
+BATCH_SIZE     = 2 # Default: Work_PC: 2
 LEARNING_RATE  = 0.001*BATCH_SIZE # Default: Work_PC: 0.001*BATCH_SIZE
 
 # Transformation Parameters:
@@ -168,7 +168,7 @@ train_dataset = Object_Detection(root=dataset_path, transforms=get_transforms(Tr
 
 
 # lets load the faster rcnn model
-model = models.detection.fasterrcnn_resnet50_fpn_v2(pretrained=True, box_detections_per_img=500)
+model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, box_detections_per_img=500)
 # model = models.detection.fasterrcnn_resnet50_fpn_v2(pretrained=True) # HOW TO MAKE THIS ONE EXIST
 in_features = model.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes)
