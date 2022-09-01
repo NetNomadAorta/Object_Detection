@@ -329,14 +329,21 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     if ii % ten_scale == 0:
         fps_end_time = time.time()
         fps_time_lapsed = fps_end_time - fps_start_time
+        fps = round(ten_scale/fps_time_lapsed, 2)
+        percent_progress = round(ii/len(os.listdir(TO_PREDICT_PATH))*100)
+        images_left = len(os.listdir(TO_PREDICT_PATH)) - ii
+        
+        time_left = images_left/(fps) # in seconds
+        mins = time_left // 60
+        sec = time_left % 60
         
         sys.stdout.write('\033[2K\033[1G')
-        print("  " + str(round(ii/len(os.listdir(TO_PREDICT_PATH))*100) ) + "%",
-              "-",  round(ten_scale/fps_time_lapsed, 2), "FPS",
+        print("  " + str(percent_progress) + "%",
+              "-",  fps, "FPS -",
+              "Time Left: {0}m:{1}s".format(int(mins), round(sec) ),
               end="\r"
               )
         fps_start_time = time.time()
-            
 
 
 print("Done!")
