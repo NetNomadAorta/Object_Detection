@@ -27,7 +27,7 @@ DATASET_PATH_1 = "./Training_Data/" + SAVE_NAME_OD_1.split("./Models-OD/",1)[1].
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME_OD_1)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
-MIN_SCORE_1             = 0.50 # Default 0.5
+MIN_SCORE_1             = 0.60 # Default 0.5
 RENAME_TOGGLE           = True
 
 
