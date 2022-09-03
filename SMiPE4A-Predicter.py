@@ -304,7 +304,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     save_image(predicted_image/255, PREDICTED_PATH + image_name + ".jpg")
     
     # Removes images if number of dies between a certain amount
-    if len(dieCoordinates) >= 99 and len(dieCoordinates) <= 100:
+    if len(dieCoordinates) >= 99 and len(dieCoordinates) <= 150:
         os.remove(image_path)
     
     ten_scale = int(len(os.listdir(TO_PREDICT_PATH))*0.01)
