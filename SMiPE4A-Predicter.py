@@ -27,7 +27,7 @@ DATASET_PATH_1 = "./Training_Data/" + SAVE_NAME_OD_1.split("./Models-OD/",1)[1].
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME_OD_1)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
-MIN_SCORE_1             = 0.40 # Default 0.5
+MIN_SCORE_1             = 0.50 # Default 0.5
 RENAME_TOGGLE           = True
 
 
@@ -305,6 +305,11 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     
     # # Removes images if number of dies between a certain amount
     # if len(dieCoordinates) >= 99 and len(dieCoordinates) <= 100:
+    #     os.remove(image_path)
+    
+    # # Removes images if doesn't have label/class wanted
+    # if not (len(die_class_indexes[die_class_indexes == 6]) > 0
+    #         ):
     #     os.remove(image_path)
     
     ten_scale = max(int(len(os.listdir(TO_PREDICT_PATH))*0.01), 1)
