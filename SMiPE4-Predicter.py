@@ -242,20 +242,49 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     else:
         path_col_number = 20 + path_col_number // 2  
     
+    # Sets the box width and height
     if len(dieCoordinates) > 0:
-        box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
-        box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
+        # If cutout boxes are at the beginning, this makes sure that it 
+        #  finds a box in middle with full box width and height
+        for box_index in range(len(dieCoordinates)):
+            if (int(dieCoordinates[box_index][0]) > 150 
+                and int(dieCoordinates[box_index][1]) > 150
+                and int(dieCoordinates[box_index][2]) < (transformed_image.shape[2]-150)
+                and int(dieCoordinates[box_index][3]) < (transformed_image.shape[1]-150)
+                ):
+                box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0])
+                box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
+                break
     
     # Sets spacing between dies
-    die_spacing_max = int(box_width * .1) # I guessed
-    die_spacing = 1 + round( (die_spacing_max/box_width)*0.99, 3)
+    die_spacing_max_width = int(box_width * .15) # I guessed
+    die_spacing_width = 1 + round( (die_spacing_max_width/box_width)*0.85, 3)
+    die_spacing_max_height = int(box_width * .15) # I guessed
+    die_spacing_height = 1 + round( (die_spacing_max_height/box_width)*0.85, 3)
     
     # Grabbing max and min x and y coordinate values
     if len(dieCoordinates) > 0:
-        minX = int( torch.min(dieCoordinates[:, 0]) )
-        minY = int( torch.min(dieCoordinates[:, 1]) )
-        maxX = int( torch.max(dieCoordinates[:, 2]) )
-        maxY = int( torch.max(dieCoordinates[:, 3]) )
+        
+        # Because first boxes on edges can be cutoff, we do this
+        min_x = torch.min(dieCoordinates[:, 0])
+        min_y = torch.min(dieCoordinates[:, 1])
+        max_x = torch.max(dieCoordinates[:, 2])
+        max_y = torch.max(dieCoordinates[:, 3])
+        
+        for dieCoordinate_index, dieCoordinate in enumerate(dieCoordinates):
+            if min_x in dieCoordinate[0]:
+                min_x_index = dieCoordinate_index
+            
+            if min_y in dieCoordinate[1]:
+                min_y_index = dieCoordinate_index
+        
+        row_2_y_start = dieCoordinates[min_y_index, 3]
+        col_2_x_start = dieCoordinates[min_x_index, 2]
+        
+        minX = int( min_x )
+        minY = int( min_y )
+        maxX = int( max_x )
+        maxY = int( max_y )
     
     # Changes column names in dieNames
     for box_index in range(len(dieCoordinates)):
@@ -269,9 +298,17 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         midY = round((y1 + y2)/2)
         
         # Creates dieNames list row and column number
-        rowNumber = math.floor((y1-minY)/(box_width*die_spacing)+1)
+        if y1 < row_2_y_start:
+            rowNumber = 1
+        else:
+            rowNumber = math.floor(max((y1-row_2_y_start),0)/(box_height*die_spacing_height)+2)
+        # rowNumber = math.floor(max((y1-minY),0)/(box_height*die_spacing_height)+1)
         rowNumber = str(rowNumber)
-        colNumber = math.floor((x1-minX)/(box_height*die_spacing)+1)
+        if x1 < col_2_x_start:
+            colNumber = 1
+        else:
+            colNumber = math.floor(max((x1-col_2_x_start),0)/(box_width*die_spacing_width)+2)
+        # colNumber = math.floor(max((x1-minX),0)/(box_width*die_spacing_width)+1)
         colNumber = str(colNumber)
         
         real_rowNum = (path_row_number - 1)*10 + int(rowNumber)
