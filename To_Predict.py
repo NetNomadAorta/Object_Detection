@@ -20,7 +20,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/SHREK_Die_Cropper-0.model"
+SAVE_NAME_OD = "./Models-OD/Lord_of_Models-0.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
@@ -31,6 +31,7 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 SAVE_ORIGINAL_IMAGE     = False
 SAVE_CROPPED_IMAGES     = False
+SAVE_LARGENED_CROPPED_IMAGES = False
 DIE_SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.6 # Default 0.5
 
@@ -212,6 +213,53 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         
     if SAVE_ORIGINAL_IMAGE and len(die_class_indexes) != 0:
         cv2.imwrite(PREDICTED_PATH + image_name.replace(".jpg","") + "-Original.jpg", orig_image)
+    
+    # Saves image of cropped widened-boxed objects 
+    #  - Uncomment and add interested only classes/labels
+    if (SAVE_LARGENED_CROPPED_IMAGES 
+        # and (len(dieCoordinates[die_class_indexes == 2]) != 0
+        #      or len(dieCoordinates[die_class_indexes == 3]) != 0
+        #      )
+        and len(die_class_indexes) != 0
+        ):
+        
+        # # Recreates dieCoordinates with interested classes/labels
+        # cat_1 = dieCoordinates[die_class_indexes == 2]
+        # cat_2 = dieCoordinates[die_class_indexes == 3]
+        # dieCoordinates = torch.cat((cat_1, cat_2), 0)
+        
+        box_height_all = int(max(dieCoordinates[:, 3])) - int(min(dieCoordinates[:, 1]))
+        box_width_all = int(max(dieCoordinates[:, 2])) - int(min(dieCoordinates[:, 0]))
+        
+        # Calculates what values to widen box to crop
+        if box_height_all < (transformed_image.shape[1] * .1):
+            y_to_add = int( box_height_all/1 )
+        else:
+            y_to_add = int( box_height_all/18 )
+        
+        if box_width_all < (transformed_image.shape[2] * .1):
+            x_to_add = int( box_width_all/1 )
+        else:
+            x_to_add = int( box_width_all/18 )
+        
+        y_min = max(int(min(dieCoordinates[:, 1]))-y_to_add, 
+                    0
+                    )
+        y_max = min(int(max(dieCoordinates[:, 3]))+y_to_add, 
+                    transformed_image.shape[1]
+                    )
+        x_min = max(int(min(dieCoordinates[:, 0]))-x_to_add, 
+                    0
+                    )
+        x_max = min(int(max(dieCoordinates[:, 2]))+x_to_add, 
+                    transformed_image.shape[2]
+                    )
+        
+        save_image(transformed_image[:, 
+                                     y_min:y_max, 
+                                     x_min:x_max
+                                     ]/255, 
+                    PREDICTED_PATH + image_name.replace(".jpg","") + "-Largen_Crop.jpg")
     
     if SAVE_CROPPED_IMAGES:
         # Grabs row and column number from image name and corrects them
