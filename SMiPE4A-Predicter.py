@@ -27,7 +27,7 @@ DATASET_PATH_1 = "./Training_Data/" + SAVE_NAME_OD_1.split("./Models-OD/",1)[1].
 IMAGE_SIZE     = int(re.findall(r'\d+', SAVE_NAME_OD_1)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
-MIN_SCORE_1             = 0.60 # Default 0.5
+MIN_SCORE_1             = 0.55 # Default 0.5
 RENAME_TOGGLE           = True
 
 
@@ -233,23 +233,56 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     path_row_number = int( re.findall(r'\d+', image_name)[0] )
     path_col_number = int( re.findall(r'\d+', image_name)[1] )
     path_part_number = int( re.findall(r'\d+', image_name)[2] )
-    part_row_number = (8 - path_part_number % 8) * 10
-    part_col_number = (path_part_number // 8) * 10
     
+    if path_part_number % 8 == 0:
+        part_row_number = 0
+    else:
+        part_row_number = (8 - path_part_number % 8) * 10
+    part_col_number = ((path_part_number-1) // 8) * 10
+    
+    # Sets the box width and height
     if len(dieCoordinates) > 0:
-        box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
-        box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
+        # If cutout boxes are at the beginning, this makes sure that it 
+        #  finds a box in middle with full box width and height
+        for box_index in range(len(dieCoordinates)):
+            if (int(dieCoordinates[box_index][0]) > 150 
+                and int(dieCoordinates[box_index][1]) > 150
+                and int(dieCoordinates[box_index][2]) < (transformed_image.shape[2]-150)
+                and int(dieCoordinates[box_index][3]) < (transformed_image.shape[1]-150)
+                ):
+                box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0])
+                box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
+                break
     
     # Sets spacing between dies
-    die_spacing_max = int(box_width * .1) # I guessed
-    die_spacing = 1 + round( (die_spacing_max/box_width)*0.99, 3)
+    die_spacing_max_width = int(box_width * .15) # I guessed
+    die_spacing_width = 1 + round( (die_spacing_max_width/box_width)*0.80, 3)
+    die_spacing_max_height = int(box_width * .15) # I guessed
+    die_spacing_height = 1 + round( (die_spacing_max_height/box_width)*0.80, 3)
     
     # Grabbing max and min x and y coordinate values
     if len(dieCoordinates) > 0:
-        minX = int( torch.min(dieCoordinates[:, 0]) )
-        minY = int( torch.min(dieCoordinates[:, 1]) )
-        maxX = int( torch.max(dieCoordinates[:, 2]) )
-        maxY = int( torch.max(dieCoordinates[:, 3]) )
+        
+        # Because first boxes on edges can be cutoff, we do this
+        min_x = torch.min(dieCoordinates[:, 0])
+        min_y = torch.min(dieCoordinates[:, 1])
+        max_x = torch.max(dieCoordinates[:, 2])
+        max_y = torch.max(dieCoordinates[:, 3])
+        
+        for dieCoordinate_index, dieCoordinate in enumerate(dieCoordinates):
+            if min_x in dieCoordinate[0]:
+                min_x_index = dieCoordinate_index
+            
+            if min_y in dieCoordinate[1]:
+                min_y_index = dieCoordinate_index
+        
+        row_2_y_start = dieCoordinates[min_y_index, 3]
+        col_2_x_start = dieCoordinates[min_x_index, 2]
+        
+        minX = int( min_x )
+        minY = int( min_y )
+        maxX = int( max_x )
+        maxY = int( max_y )
     
     # Changes column names in dieNames
     for box_index in range(len(dieCoordinates)):
@@ -263,25 +296,27 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         midY = round((y1 + y2)/2)
         
         # Creates dieNames list row and column number
-        rowNumber = math.floor((y1-minY)/(box_width*die_spacing)+1)
+        if y1 < row_2_y_start:
+            rowNumber = 1
+        else:
+            rowNumber = math.floor(max((y1-row_2_y_start),0)/(box_height*die_spacing_height)+2)
+        # rowNumber = math.floor(max((y1-minY),0)/(box_height*die_spacing_height)+1)
         rowNumber = str(rowNumber)
-        colNumber = math.floor((x1-minX)/(box_height*die_spacing)+1)
+        if x1 < col_2_x_start:
+            colNumber = 1
+        else:
+            colNumber = math.floor(max((x1-col_2_x_start),0)/(box_width*die_spacing_width)+2)
+        # colNumber = math.floor(max((x1-minX),0)/(box_width*die_spacing_width)+1)
         colNumber = str(colNumber)
         
         real_rowNum = (path_row_number - 1)*80 + part_row_number + int(rowNumber)
         real_colNum = (path_col_number - 1)*200 + part_col_number + int(colNumber)
         
-        # THIS PART IS FOR LED 160,000 WAFER!
-        if int(real_colNum)>200:
-            real_colNum = str( int(real_colNum) )
-        
+        # Adds '0's in string if needed
         if int(real_colNum) < 10:
             real_colNum = "00" + str(real_colNum)
         elif int(real_colNum) < 100:
             real_colNum = "0" + str(real_colNum)
-        
-        if int(real_rowNum)>200:
-            real_rowNum = str( int(real_rowNum) )
         
         if int(real_rowNum) < 10:
             real_rowNum = "00" + str(real_rowNum)
@@ -341,12 +376,12 @@ print("")
 del classes_1[0]
 
 # XLSX PART
-max_row = 400
+max_row = 320
 max_col = 400
 
 
 # Finds how many rows and columns per Excel sheet
-row_per_sheet = 200
+row_per_sheet = 160
 col_per_sheet = 200
 
 # Iterates over each row_per_sheet x col_per_sheet dies 
