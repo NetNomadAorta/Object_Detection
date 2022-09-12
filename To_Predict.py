@@ -29,9 +29,9 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH          = "//mcrtp-sftp-01/aoitool/SMiPE4-623-Cropped/XDCC000109C2/"    # USE FOR XDisplay LOTS!
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = False
-SAVE_ORIGINAL_IMAGE     = False
+SAVE_ORIGINAL_IMAGE     = True
 SAVE_CROPPED_IMAGES     = False
-SAVE_LARGENED_CROPPED_IMAGES = True
+SAVE_LARGENED_CROPPED_IMAGES = False
 DIE_SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.6 # Default 0.5
 
@@ -353,22 +353,6 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             real_image_name = "R_{}.C_{}.jpg".format(real_rowNum, real_colNum)
             save_image(transformed_image[:, ymin:ymax, xmin:xmax]/255, 
                         PREDICTED_PATH + real_image_name)
-    
-    if len(os.listdir(TO_PREDICT_PATH)) > 2000:
-        tenScale = 1000
-    elif len(os.listdir(TO_PREDICT_PATH)) > 1000:
-        tenScale = 500
-    else:
-        tenScale = 100
-
-    ii += 1
-    if ii % tenScale == 0:
-        fps_end_time = time.time()
-        fps_time_lapsed = fps_end_time - fps_start_time
-        print("  " + str(ii) + " of " 
-              + str(len(os.listdir(TO_PREDICT_PATH))), 
-              "-",  round(tenScale/fps_time_lapsed, 2), "FPS")
-        fps_start_time = time.time()
     
     
     ten_scale = int(len(os.listdir(TO_PREDICT_PATH))*0.01)
