@@ -232,19 +232,8 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         box_width_all = int(max(dieCoordinates[:, 2])) - int(min(dieCoordinates[:, 0]))
         
         # Calculates what values to widen box to crop
-        if box_height_all < (transformed_image.shape[1] * .05):
-            y_to_add = int( box_height_all*4 )
-        elif box_height_all < (transformed_image.shape[1] * .1):
-            y_to_add = int( box_height_all*2 )
-        else:
-            y_to_add = int( box_height_all/18 )
-        
-        if box_width_all < (transformed_image.shape[2] * .05):
-            x_to_add = int( box_width_all*4)
-        elif box_width_all < (transformed_image.shape[2] * .1):
-            x_to_add = int( box_width_all*2 )
-        else:
-            x_to_add = int( box_width_all/18 )
+        y_to_add = int( -101*(box_height_all/transformed_image.shape[1])+101 )
+        x_to_add = int( -101*(box_width_all/transformed_image.shape[2])+101 )
         
         y_min = max(int(min(dieCoordinates[:, 1]))-y_to_add, 
                     0
