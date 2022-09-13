@@ -30,7 +30,7 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 SAVE_CROPPED_IMAGES     = False
-MIN_SCORE               = 0.7
+MIN_SCORE               = 0.6
 NUMBER_TO_RUN = 1000
 NUMBER_DIE_PER_IMAGE = 0
 
