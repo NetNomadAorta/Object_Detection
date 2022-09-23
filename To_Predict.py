@@ -371,6 +371,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         fps_start_time = time.time()
 
 
+print() # Since above print tries to write in last line used, this one clears it up
 print("Done!")
 
 # Stopping stopwatch to see how long process takes
