@@ -258,9 +258,9 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     
     # Sets spacing between dies
     die_spacing_max_width = int(box_width * .15) # I guessed
-    die_spacing_width = 1 + round( (die_spacing_max_width/box_width)*0.85, 3)
+    die_spacing_width = 1 + round( (die_spacing_max_width/box_width)*0.80, 3)
     die_spacing_max_height = int(box_width * .15) # I guessed
-    die_spacing_height = 1 + round( (die_spacing_max_height/box_width)*0.85, 3)
+    die_spacing_height = 1 + round( (die_spacing_max_height/box_width)*0.80, 3)
     
     # Grabbing max and min x and y coordinate values
     if len(dieCoordinates) > 0:
