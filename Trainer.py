@@ -168,7 +168,9 @@ train_dataset = Object_Detection(root=dataset_path, transforms=get_transforms(Tr
 
 
 # lets load the faster rcnn model
-model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, box_detections_per_img=500)
+model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
+                                                 box_detections_per_img=500,
+                                                 max_size=2500)
 # model = models.detection.fasterrcnn_resnet50_fpn_v2(pretrained=True) # HOW TO MAKE THIS ONE EXIST
 in_features = model.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes)
