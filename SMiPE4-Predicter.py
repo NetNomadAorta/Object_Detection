@@ -119,7 +119,11 @@ n_classes_1 = len(categories_1.keys())
 classes_1 = [i[1]['name'] for i in categories_1.items()]
 
 # lets load the faster rcnn model
-model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, box_detections_per_img=500)
+model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
+                                                   box_detections_per_img=500,
+                                                   min_size=IMAGE_SIZE,
+                                                   max_size=IMAGE_SIZE,
+                                                   box_score_thresh=MIN_SCORE_1)
 in_features_1 = model_1.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model_1.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features_1, n_classes_1)
 
@@ -143,7 +147,7 @@ model_1.eval()
 torch.cuda.empty_cache()
 
 transforms_1 = A.Compose([
-    A.Resize(IMAGE_SIZE, IMAGE_SIZE),
+    # A.Resize(IMAGE_SIZE, IMAGE_SIZE),
     A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
@@ -213,10 +217,10 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         prediction_1 = model_1([(transformed_image/255).to(device)])
         pred_1 = prediction_1[0]
     
-    dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE_1]
-    die_class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE_1]
+    dieCoordinates = pred_1['boxes']
+    die_class_indexes = pred_1['labels']
     # BELOW SHOWS SCORES - COMMENT OUT IF NEEDED
-    die_scores = pred_1['scores'][pred_1['scores'] > MIN_SCORE_1]
+    die_scores = pred_1['scores']
     
     predicted_image = draw_bounding_boxes(transformed_image,
         boxes = dieCoordinates,
