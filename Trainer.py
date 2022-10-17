@@ -170,7 +170,7 @@ train_dataset = Object_Detection(root=dataset_path, transforms=get_transforms(Tr
 # lets load the faster rcnn model
 model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
                                                  box_detections_per_img=500,
-                                                 min_size=1200,
+                                                 min_size=1700, # 1200 at work, 1700 at home
                                                  max_size=2500
                                                  )
 # model = models.detection.fasterrcnn_resnet50_fpn_v2(pretrained=True) # HOW TO MAKE THIS ONE EXIST
