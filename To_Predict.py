@@ -78,6 +78,7 @@ def replaceFileName(slot_path):
                           .replace("TPV2_Pave.", "")\
                           .replace("A-Unity_Pave.", "")\
                           .replace("E-Merlin_Pave.", "")\
+                          .replace("A-Exoplanet_Pave.", "")\
                           .replace("Window_", "")\
                           .replace("Row_1.", "Row_01.")\
                           .replace("Col_1.", "Col_01.")\
