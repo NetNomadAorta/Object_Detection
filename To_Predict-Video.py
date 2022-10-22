@@ -16,7 +16,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/RF_Analog-0.model"
+SAVE_NAME_OD = "./Models-OD/Bolt_Vibrations-0.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
 IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
@@ -78,7 +78,11 @@ classes_1 = [i[1]['name'] for i in categories.items()]
 
 
 # lets load the faster rcnn model
-model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
+                                                   box_detections_per_img=500,
+                                                   min_size=1700, # 1200 at work, 1700 at home
+                                                   max_size=2500
+                                                   )
 in_features = model_1.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model_1.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes_1)
 
@@ -119,10 +123,15 @@ for video_name in os.listdir(TO_PREDICT_PATH):
     
     video_capture = cv2.VideoCapture(video_path)
     
+    # Video frame count and fps needed for VideoWriter settings
+    frame_count = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    video_fps = round( video_capture.get(cv2.CAP_PROP_FPS) )
+    
+    # If successful and image of frame
     success, image_b4_color = video_capture.read()
     
     fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-    video_out = cv2.VideoWriter(PREDICTED_PATH + video_name, fourcc, 20.0, 
+    video_out = cv2.VideoWriter(PREDICTED_PATH + video_name, fourcc, video_fps, 
                                 (int(image_b4_color.shape[1]), 
                                  int(image_b4_color.shape[0])
                                  )
@@ -134,9 +143,9 @@ for video_name in os.listdir(TO_PREDICT_PATH):
         if not success:
             break
         
-        if count % 6 != 0:
-            count += 1
-            continue
+        # if count % 6 != 0:
+        #     count += 1
+        #     continue
         
         image = cv2.cvtColor(image_b4_color, cv2.COLOR_BGR2RGB)
         
@@ -215,7 +224,7 @@ for video_name in os.listdir(TO_PREDICT_PATH):
             fps_end_time = time.time()
             fps_time_lapsed = fps_end_time - fps_start_time
             print("  " + str(ii) + " of " 
-                  + str(len(os.listdir(TO_PREDICT_PATH))), 
+                  + str(frame_count), 
                   "-",  round(tenScale/fps_time_lapsed, 2), "FPS")
             fps_start_time = time.time()
         
