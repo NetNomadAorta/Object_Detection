@@ -29,9 +29,9 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH          = "//mcrtp-sftp-01/aoitool/SMiPE4-623-Cropped/XDCC000109C2/"    # USE FOR XDisplay LOTS!
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = False
-SAVE_ORIGINAL_IMAGE     = False
+SAVE_ORIGINAL_IMAGE     = True
 SAVE_CROPPED_IMAGES     = False
-SAVE_LARGENED_CROPPED_IMAGES = True
+SAVE_LARGENED_CROPPED_IMAGES = False
 DIE_SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.6 # Default 0.5
 
@@ -216,7 +216,11 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         
         # save_image((predicted_image/255), PREDICTED_PATH + image_name)
         
-    if SAVE_ORIGINAL_IMAGE and len(die_class_indexes) != 0:
+    if (SAVE_ORIGINAL_IMAGE and len(die_class_indexes) != 0
+        and (len(dieCoordinates[die_class_indexes == 2]) != 0
+              or len(dieCoordinates[die_class_indexes == 3]) != 0
+              )
+        ):
         cv2.imwrite(PREDICTED_PATH + image_name.replace(".jpg","") + "-Original.jpg", orig_image)
     
     # Saves image of cropped widened-boxed objects 
