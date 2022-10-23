@@ -130,7 +130,7 @@ classes_1
 # lets load the faster rcnn model
 model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
                                                    box_detections_per_img=500,
-                                                   min_size=1200,
+                                                   min_size=1700,
                                                    max_size=2500
                                                    )
 in_features = model_1.roi_heads.box_predictor.cls_score.in_features # we need to change the head
@@ -200,6 +200,9 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             
     
     if SAVE_ANNOTATED_IMAGES:
+        dieCoordinates = dieCoordinates[die_class_indexes != 1]
+        die_class_indexes = die_class_indexes[die_class_indexes != 1]
+        
         predicted_image = draw_bounding_boxes(transformed_image,
             boxes = dieCoordinates,
             # labels = [classes_1[i] for i in die_class_indexes], 
