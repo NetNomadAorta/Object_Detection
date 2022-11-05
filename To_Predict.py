@@ -29,7 +29,7 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH          = "//mcrtp-sftp-01/aoitool/SMiPE4-623-Cropped/XDCC000109C2/"    # USE FOR XDisplay LOTS!
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = True
-SAVE_ORIGINAL_IMAGE     = False
+SAVE_ORIGINAL_IMAGE     = True
 SAVE_CROPPED_IMAGES     = False
 SAVE_LARGENED_CROPPED_IMAGES = False
 DIE_SPACING_SCALE       = 0.99
@@ -203,6 +203,13 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         dieCoordinates = dieCoordinates[die_class_indexes != 1]
         die_class_indexes = die_class_indexes[die_class_indexes != 1]
         
+        # Filters out sizes below certain size
+        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        # Now height
+        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        
         predicted_image = draw_bounding_boxes(transformed_image,
             boxes = dieCoordinates,
             # labels = [classes_1[i] for i in die_class_indexes], 
@@ -215,7 +222,8 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         
         # Saves full image with bounding boxes
         if len(die_class_indexes) != 0:
-            save_image((predicted_image/255), PREDICTED_PATH + image_name)
+            save_image((predicted_image/255), PREDICTED_PATH 
+                       + image_name.replace(".jpg","") + "-Annot.jpg")
         
         # save_image((predicted_image/255), PREDICTED_PATH + image_name)
         
@@ -224,6 +232,14 @@ for image_name in os.listdir(TO_PREDICT_PATH):
               or len(dieCoordinates[die_class_indexes == 3]) != 0
               )
         ):
+        
+        # Filters out sizes below certain size
+        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        # Now height
+        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        
         cv2.imwrite(PREDICTED_PATH + image_name, orig_image)
     
     # Saves image of cropped widened-boxed objects 
@@ -234,6 +250,13 @@ for image_name in os.listdir(TO_PREDICT_PATH):
               )
         and len(die_class_indexes) != 0
         ):
+        
+        # Filters out sizes below certain size
+        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        # Now height
+        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
         
         # Recreates dieCoordinates with interested classes/labels
         cat_1 = dieCoordinates[die_class_indexes == 2]
