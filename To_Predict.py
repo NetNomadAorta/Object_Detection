@@ -28,10 +28,11 @@ TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH          = "//mcrtp-sftp-01/aoitool/SMiPE4-623-Cropped/XDCC000109C2/"    # USE FOR XDisplay LOTS!
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
-SAVE_ANNOTATED_IMAGES   = True
-SAVE_ORIGINAL_IMAGE     = True
+SAVE_ANNOTATED_IMAGES   = False
+SAVE_ORIGINAL_IMAGE     = False
 SAVE_CROPPED_IMAGES     = False
 SAVE_LARGENED_CROPPED_IMAGES = False
+BLACKENNED_NON_OBJ_IMG  = True
 DIE_SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.6 # Default 0.5
 
@@ -288,6 +289,63 @@ for image_name in os.listdir(TO_PREDICT_PATH):
                                      x_min:x_max
                                      ]/255, 
                     PREDICTED_PATH + image_name.replace(".jpg","") + "-Largen_Crop.jpg")
+        
+    
+    # Saves image of Original image that is blackened where no object is at
+    #  - Uncomment and add interested only classes/labels
+    if (BLACKENNED_NON_OBJ_IMG 
+        and (len(dieCoordinates[die_class_indexes == 2]) != 0
+              or len(dieCoordinates[die_class_indexes == 3]) != 0
+              )
+        and len(die_class_indexes) != 0
+        ):
+        
+        # Filters out sizes below certain size
+        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        # Now height
+        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        
+        # Recreates dieCoordinates with interested classes/labels
+        cat_1 = dieCoordinates[die_class_indexes == 2]
+        cat_2 = dieCoordinates[die_class_indexes == 3]
+        dieCoordinates_cat = torch.cat((cat_1, cat_2), 0)
+        
+        if len(dieCoordinates_cat) > 0:
+        
+            box_height_all = int(max(dieCoordinates_cat[:, 3])) - int(min(dieCoordinates_cat[:, 1]))
+            box_width_all = int(max(dieCoordinates_cat[:, 2])) - int(min(dieCoordinates_cat[:, 0]))
+            
+            # Calculates what values to widen box to crop
+            y_to_add = int( -101*(box_height_all/transformed_image.shape[1])+101 )
+            x_to_add = int( -101*(box_width_all/transformed_image.shape[2])+101 )
+            # y_to_add = 0
+            # x_to_add = 0
+            
+            y_min = max(int(min(dieCoordinates_cat[:, 1]))-y_to_add, 
+                        0
+                        )
+            y_max = min(int(max(dieCoordinates_cat[:, 3]))+y_to_add, 
+                        transformed_image.shape[1]
+                        )
+            x_min = max(int(min(dieCoordinates_cat[:, 0]))-x_to_add, 
+                        0
+                        )
+            x_max = min(int(max(dieCoordinates_cat[:, 2]))+x_to_add, 
+                        transformed_image.shape[2]
+                        )
+            
+            blackened_image = transformed_image.detach().clone()
+            blackened_image[:, :y_min, :] = 0
+            blackened_image[:, :, :x_min] = 0
+            blackened_image[:, y_max:-1, :-1] = 0
+            blackened_image[:, :-1, x_max:-1] = 0
+            
+            
+            save_image(blackened_image/255, 
+                        PREDICTED_PATH + image_name.replace(".jpg","") + "-Blackenned.jpg")
+    
     
     if SAVE_CROPPED_IMAGES:
         # Grabs row and column number from image name and corrects them

@@ -57,7 +57,7 @@ def get_transforms(train=False):
             # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # I don't include anymore because OD models doesn't discriminate against size
             # A.Rotate(limit=[90,90], always_apply=True),
             A.GaussianBlur(blur_limit = (3,5), p = BLUR_PROB),
-            A.Downscale(scale_min = 0.40, scale_max = 0.99, p = DOWNSCALE_PROB),
+            A.Downscale(scale_min = 0.35, scale_max = 0.99, p = DOWNSCALE_PROB),
             A.GaussNoise(var_limit = (1.0, 10.0), p = NOISE_PROB),
             A.MotionBlur(5, p = MOTION_BLUR_PROB),
             A.ColorJitter(brightness = BRIGHTNESS_CHANGE, 
@@ -171,7 +171,7 @@ train_dataset = Object_Detection(root=dataset_path, transforms=get_transforms(Tr
 model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
                                                  box_detections_per_img=500,
                                                  min_size=1700, # 1200 at work, 1700 at home
-                                                 max_size=2500
+                                                 max_size=3500
                                                  )
 # model = models.detection.fasterrcnn_resnet50_fpn_v2(pretrained=True) # HOW TO MAKE THIS ONE EXIST
 in_features = model.roi_heads.box_predictor.cls_score.in_features # we need to change the head
