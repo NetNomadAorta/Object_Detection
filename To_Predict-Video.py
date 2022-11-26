@@ -27,7 +27,7 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 SAVE_ORIGINAL_IMAGE     = False
 SAVE_CROPPED_IMAGES     = False
-DIE_SPACING_SCALE       = 0.99
+SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.7 # Default 0.5
 
 
@@ -159,39 +159,39 @@ for video_name in os.listdir(TO_PREDICT_PATH):
             prediction_1 = model_1([(transformed_image/255).to(device)])
             pred_1 = prediction_1[0]
         
-        dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
-        die_class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE]
+        coordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
+        class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE]
         # BELOW SHOWS SCORES - COMMENT OUT IF NEEDED
-        die_scores = pred_1['scores'][pred_1['scores'] > MIN_SCORE]
+        scores = pred_1['scores'][pred_1['scores'] > MIN_SCORE]
         
-        # labels_found = [str(int(die_scores[index]*100)) + "% - " + str(classes_1[class_index]) 
-        #                 for index, class_index in enumerate(die_class_indexes)]
+        # labels_found = [str(int(scores[index]*100)) + "% - " + str(classes_1[class_index]) 
+        #                 for index, class_index in enumerate(class_indexes)]
         labels_found = [str(classes_1[class_index]) 
-                        for index, class_index in enumerate(die_class_indexes)]
+                        for index, class_index in enumerate(class_indexes)]
         
-        boxes_widened = dieCoordinates
+        boxes_widened = coordinates
         # Widens boxes
-        for i in range(len(dieCoordinates)):
-            box_width = dieCoordinates[i,2]-dieCoordinates[i,0]
-            box_height = dieCoordinates[i,3]-dieCoordinates[i,1]
+        for i in range(len(coordinates)):
+            box_width = coordinates[i,2]-coordinates[i,0]
+            box_height = coordinates[i,3]-coordinates[i,1]
             
             # Width
-            boxes_widened[i, 0] = max(dieCoordinates[i][0] - int(box_width/3), 0)
-            boxes_widened[i, 2] = min(dieCoordinates[i][2] + int(box_width/3), transformed_image.shape[2])
+            boxes_widened[i, 0] = max(coordinates[i][0] - int(box_width/3), 0)
+            boxes_widened[i, 2] = min(coordinates[i][2] + int(box_width/3), transformed_image.shape[2])
             
             # Height
-            boxes_widened[i, 1] = max(dieCoordinates[i][1] - int(box_height/3), 0)
-            boxes_widened[i, 3] = min(dieCoordinates[i][3] + int(box_height/3), transformed_image.shape[1])
+            boxes_widened[i, 1] = max(coordinates[i][1] - int(box_height/3), 0)
+            boxes_widened[i, 3] = min(coordinates[i][3] + int(box_height/3), transformed_image.shape[1])
         
-        dieCoordinates = boxes_widened
+        coordinates = boxes_widened
         
         if SAVE_ANNOTATED_IMAGES:
             predicted_image = draw_bounding_boxes(transformed_image,
-                boxes = dieCoordinates,
-                # labels = [classes_1[i] for i in die_class_indexes], 
-                # labels = [str(round(i,2)) for i in die_scores], # SHOWS SCORE IN LABEL
+                boxes = coordinates,
+                # labels = [classes_1[i] for i in class_indexes], 
+                # labels = [str(round(i,2)) for i in scores], # SHOWS SCORE IN LABEL
                 width = line_width,
-                colors = [color_list[i] for i in die_class_indexes],
+                colors = [color_list[i] for i in class_indexes],
                 font = "arial.ttf",
                 font_size = 10
                 )
@@ -199,9 +199,9 @@ for video_name in os.listdir(TO_PREDICT_PATH):
             predicted_image_cv2 = predicted_image.permute(1,2,0).contiguous().numpy()
             predicted_image_cv2 = cv2.cvtColor(predicted_image_cv2, cv2.COLOR_RGB2BGR)
             
-            for dieCoordinate_index, dieCoordinate in enumerate(dieCoordinates):
-                start_point = ( int(dieCoordinate[0]), int(dieCoordinate[1]) )
-                # end_point = ( int(dieCoordinate[2]), int(dieCoordinate[3]) )
+            for coordinate_index, coordinate in enumerate(coordinates):
+                start_point = ( int(coordinate[0]), int(coordinate[1]) )
+                # end_point = ( int(coordinate[2]), int(coordinate[3]) )
                 color = (255, 255, 255)
                 # thickness = 3
                 # cv2.rectangle(predicted_image_cv2, start_point, end_point, color, thickness)
@@ -210,7 +210,7 @@ for video_name in os.listdir(TO_PREDICT_PATH):
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 fontScale = 1.0
                 thickness = 2
-                cv2.putText(predicted_image_cv2, labels_found[dieCoordinate_index], 
+                cv2.putText(predicted_image_cv2, labels_found[coordinate_index], 
                             start_point_text, font, fontScale, color, thickness)
             
             # Saves video with bounding boxes

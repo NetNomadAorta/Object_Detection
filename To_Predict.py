@@ -33,7 +33,7 @@ SAVE_ORIGINAL_IMAGE     = False
 SAVE_CROPPED_IMAGES     = False
 SAVE_LARGENED_CROPPED_IMAGES = False
 BLACKENNED_NON_OBJ_IMG  = True
-DIE_SPACING_SCALE       = 0.99
+SPACING_SCALE       = 0.99
 MIN_SCORE               = 0.6 # Default 0.5
 
 
@@ -187,100 +187,100 @@ for image_name in os.listdir(TO_PREDICT_PATH):
         prediction_1 = model_1([(transformed_image/255).to(device)])
         pred_1 = prediction_1[0]
     
-    dieCoordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
-    die_class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE]
+    coordinates = pred_1['boxes'][pred_1['scores'] > MIN_SCORE]
+    class_indexes = pred_1['labels'][pred_1['scores'] > MIN_SCORE]
     # BELOW SHOWS SCORES - COMMENT OUT IF NEEDED
-    die_scores = pred_1['scores'][pred_1['scores'] > MIN_SCORE]
+    scores = pred_1['scores'][pred_1['scores'] > MIN_SCORE]
     
     # # DELETES NOT WANTED LABELS
-    # for index, class_index in enumerate(die_class_indexes):
-    #     if len(die_class_indexes) > 0:
-    #         dieCoordinates = dieCoordinates[die_class_indexes == 2]
-    #         die_scores = die_scores[die_class_indexes == 2]
-    #         die_class_indexes = die_class_indexes[die_class_indexes == 2]
+    # for index, class_index in enumerate(class_indexes):
+    #     if len(class_indexes) > 0:
+    #         coordinates = coordinates[class_indexes == 2]
+    #         scores = scores[class_indexes == 2]
+    #         class_indexes = class_indexes[class_indexes == 2]
             
     
     if SAVE_ANNOTATED_IMAGES:
-        dieCoordinates = dieCoordinates[die_class_indexes != 1]
-        die_class_indexes = die_class_indexes[die_class_indexes != 1]
+        coordinates = coordinates[class_indexes != 1]
+        class_indexes = class_indexes[class_indexes != 1]
         
         # Filters out sizes below certain size
-        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
-        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        class_indexes = class_indexes[abs(coordinates[:,2]-coordinates[:,0])>35]
+        coordinates = coordinates[abs(coordinates[:,2]-coordinates[:,0])>35]
         # Now height
-        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
-        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        class_indexes = class_indexes[abs(coordinates[:,3]-coordinates[:,1])>35]
+        coordinates = coordinates[abs(coordinates[:,3]-coordinates[:,1])>35]
         
         predicted_image = draw_bounding_boxes(transformed_image,
-            boxes = dieCoordinates,
-            # labels = [classes_1[i] for i in die_class_indexes], 
-            # labels = [str(round(i,2)) for i in die_scores], # SHOWS SCORE IN LABEL
+            boxes = coordinates,
+            # labels = [classes_1[i] for i in class_indexes], 
+            # labels = [str(round(i,2)) for i in scores], # SHOWS SCORE IN LABEL
             width = line_width,
-            colors = [color_list[i] for i in die_class_indexes],
+            colors = [color_list[i] for i in class_indexes],
             font = "arial.ttf",
             font_size = 20
             )
         
         # Saves full image with bounding boxes
-        if len(die_class_indexes) != 0:
+        if len(class_indexes) != 0:
             save_image((predicted_image/255), PREDICTED_PATH 
                        + image_name.replace(".jpg","") + "-Annot.jpg")
         
         # save_image((predicted_image/255), PREDICTED_PATH + image_name)
         
-    if (SAVE_ORIGINAL_IMAGE and len(die_class_indexes) != 0
-        and (len(dieCoordinates[die_class_indexes == 2]) != 0
-              or len(dieCoordinates[die_class_indexes == 3]) != 0
+    if (SAVE_ORIGINAL_IMAGE and len(class_indexes) != 0
+        and (len(coordinates[class_indexes == 2]) != 0
+              or len(coordinates[class_indexes == 3]) != 0
               )
         ):
         
         # Filters out sizes below certain size
-        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
-        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        class_indexes = class_indexes[abs(coordinates[:,2]-coordinates[:,0])>35]
+        coordinates = coordinates[abs(coordinates[:,2]-coordinates[:,0])>35]
         # Now height
-        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
-        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        class_indexes = class_indexes[abs(coordinates[:,3]-coordinates[:,1])>35]
+        coordinates = coordinates[abs(coordinates[:,3]-coordinates[:,1])>35]
         
         cv2.imwrite(PREDICTED_PATH + image_name, orig_image)
     
     # Saves image of cropped widened-boxed objects 
     #  - Uncomment and add interested only classes/labels
     if (SAVE_LARGENED_CROPPED_IMAGES 
-        and (len(dieCoordinates[die_class_indexes == 2]) != 0
-              or len(dieCoordinates[die_class_indexes == 3]) != 0
+        and (len(coordinates[class_indexes == 2]) != 0
+              or len(coordinates[class_indexes == 3]) != 0
               )
-        and len(die_class_indexes) != 0
+        and len(class_indexes) != 0
         ):
         
         # Filters out sizes below certain size
-        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
-        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        class_indexes = class_indexes[abs(coordinates[:,2]-coordinates[:,0])>35]
+        coordinates = coordinates[abs(coordinates[:,2]-coordinates[:,0])>35]
         # Now height
-        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
-        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        class_indexes = class_indexes[abs(coordinates[:,3]-coordinates[:,1])>35]
+        coordinates = coordinates[abs(coordinates[:,3]-coordinates[:,1])>35]
         
-        # Recreates dieCoordinates with interested classes/labels
-        cat_1 = dieCoordinates[die_class_indexes == 2]
-        cat_2 = dieCoordinates[die_class_indexes == 3]
-        dieCoordinates = torch.cat((cat_1, cat_2), 0)
+        # Recreates coordinates with interested classes/labels
+        cat_1 = coordinates[class_indexes == 2]
+        cat_2 = coordinates[class_indexes == 3]
+        coordinates = torch.cat((cat_1, cat_2), 0)
         
-        box_height_all = int(max(dieCoordinates[:, 3])) - int(min(dieCoordinates[:, 1]))
-        box_width_all = int(max(dieCoordinates[:, 2])) - int(min(dieCoordinates[:, 0]))
+        box_height_all = int(max(coordinates[:, 3])) - int(min(coordinates[:, 1]))
+        box_width_all = int(max(coordinates[:, 2])) - int(min(coordinates[:, 0]))
         
         # Calculates what values to widen box to crop
         y_to_add = int( -101*(box_height_all/transformed_image.shape[1])+101 )
         x_to_add = int( -101*(box_width_all/transformed_image.shape[2])+101 )
         
-        y_min = max(int(min(dieCoordinates[:, 1]))-y_to_add, 
+        y_min = max(int(min(coordinates[:, 1]))-y_to_add, 
                     0
                     )
-        y_max = min(int(max(dieCoordinates[:, 3]))+y_to_add, 
+        y_max = min(int(max(coordinates[:, 3]))+y_to_add, 
                     transformed_image.shape[1]
                     )
-        x_min = max(int(min(dieCoordinates[:, 0]))-x_to_add, 
+        x_min = max(int(min(coordinates[:, 0]))-x_to_add, 
                     0
                     )
-        x_max = min(int(max(dieCoordinates[:, 2]))+x_to_add, 
+        x_max = min(int(max(coordinates[:, 2]))+x_to_add, 
                     transformed_image.shape[2]
                     )
         
@@ -294,28 +294,28 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     # Saves image of Original image that is blackened where no object is at
     #  - Uncomment and add interested only classes/labels
     if (BLACKENNED_NON_OBJ_IMG 
-        and (len(dieCoordinates[die_class_indexes == 2]) != 0
-              or len(dieCoordinates[die_class_indexes == 3]) != 0
+        and (len(coordinates[class_indexes == 2]) != 0
+              or len(coordinates[class_indexes == 3]) != 0
               )
-        and len(die_class_indexes) != 0
+        and len(class_indexes) != 0
         ):
         
         # Filters out sizes below certain size
-        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
-        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,2]-dieCoordinates[:,0])>35]
+        class_indexes = class_indexes[abs(coordinates[:,2]-coordinates[:,0])>35]
+        coordinates = coordinates[abs(coordinates[:,2]-coordinates[:,0])>35]
         # Now height
-        die_class_indexes = die_class_indexes[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
-        dieCoordinates = dieCoordinates[abs(dieCoordinates[:,3]-dieCoordinates[:,1])>35]
+        class_indexes = class_indexes[abs(coordinates[:,3]-coordinates[:,1])>35]
+        coordinates = coordinates[abs(coordinates[:,3]-coordinates[:,1])>35]
         
-        # Recreates dieCoordinates with interested classes/labels
-        cat_1 = dieCoordinates[die_class_indexes == 2]
-        cat_2 = dieCoordinates[die_class_indexes == 3]
-        dieCoordinates_cat = torch.cat((cat_1, cat_2), 0)
+        # Recreates coordinates with interested classes/labels
+        cat_1 = coordinates[class_indexes == 2]
+        cat_2 = coordinates[class_indexes == 3]
+        coordinates_cat = torch.cat((cat_1, cat_2), 0)
         
-        if len(dieCoordinates_cat) > 0:
+        if len(coordinates_cat) > 0:
         
-            box_height_all = int(max(dieCoordinates_cat[:, 3])) - int(min(dieCoordinates_cat[:, 1]))
-            box_width_all = int(max(dieCoordinates_cat[:, 2])) - int(min(dieCoordinates_cat[:, 0]))
+            box_height_all = int(max(coordinates_cat[:, 3])) - int(min(coordinates_cat[:, 1]))
+            box_width_all = int(max(coordinates_cat[:, 2])) - int(min(coordinates_cat[:, 0]))
             
             # Calculates what values to widen box to crop
             y_to_add = int( -101*(box_height_all/transformed_image.shape[1])+101 )
@@ -323,16 +323,16 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             # y_to_add = 0
             # x_to_add = 0
             
-            y_min = max(int(min(dieCoordinates_cat[:, 1]))-y_to_add, 
+            y_min = max(int(min(coordinates_cat[:, 1]))-y_to_add, 
                         0
                         )
-            y_max = min(int(max(dieCoordinates_cat[:, 3]))+y_to_add, 
+            y_max = min(int(max(coordinates_cat[:, 3]))+y_to_add, 
                         transformed_image.shape[1]
                         )
-            x_min = max(int(min(dieCoordinates_cat[:, 0]))-x_to_add, 
+            x_min = max(int(min(coordinates_cat[:, 0]))-x_to_add, 
                         0
                         )
-            x_max = min(int(max(dieCoordinates_cat[:, 2]))+x_to_add, 
+            x_max = min(int(max(coordinates_cat[:, 2]))+x_to_add, 
                         transformed_image.shape[2]
                         )
             
@@ -367,42 +367,42 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             row_grouping = (10-path_part_number)%10
             col_grouping = (path_part_number-1)//10
         
-        if len(dieCoordinates) > 0:
-            box_width = int(dieCoordinates[0][2]-dieCoordinates[0][0]) 
-            box_height = int(dieCoordinates[0][3]-dieCoordinates[0][1])
+        if len(coordinates) > 0:
+            box_width = int(coordinates[0][2]-coordinates[0][0]) 
+            box_height = int(coordinates[0][3]-coordinates[0][1])
         
-        # # Sets spacing between dies
+        # # Sets spacing between objects
         if "SMiPE4" in SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0]:
-            die_spacing_max = int(box_width * .1) # I guessed
-            die_spacing = 1 + round( (die_spacing_max/box_width)*DIE_SPACING_SCALE, 3)
+            spacing_max = int(box_width * .1) # I guessed
+            spacing = 1 + round( (spacing_max/box_width)*SPACING_SCALE, 3)
         elif "TPv2" in SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0]:
-            die_spacing_max = int(box_width * 5) # I guessed
-            die_spacing = 1 + round( (die_spacing_max/box_width)*DIE_SPACING_SCALE, 3)
+            spacing_max = int(box_width * 5) # I guessed
+            spacing = 1 + round( (spacing_max/box_width)*SPACING_SCALE, 3)
         
         # Grabbing max and min x and y coordinate values
-        if len(dieCoordinates) > 0:
-            minX = int( torch.min(dieCoordinates[:, 0]) )
-            minY = int( torch.min(dieCoordinates[:, 1]) )
-            maxX = int( torch.max(dieCoordinates[:, 2]) )
-            maxY = int( torch.max(dieCoordinates[:, 3]) )
+        if len(coordinates) > 0:
+            minX = int( torch.min(coordinates[:, 0]) )
+            minY = int( torch.min(coordinates[:, 1]) )
+            maxX = int( torch.max(coordinates[:, 2]) )
+            maxY = int( torch.max(coordinates[:, 3]) )
         
-        dieNames = []
+        names = []
         
-        # Changes column names in dieNames
-        for box_index in range(len(dieCoordinates)):
+        # Changes column names in names
+        for box_index in range(len(coordinates)):
             
-            x1 = int( dieCoordinates[box_index][0] )
-            y1 = int( dieCoordinates[box_index][1] )
-            x2 = int( dieCoordinates[box_index][2] )
-            y2 = int( dieCoordinates[box_index][3] )
+            x1 = int( coordinates[box_index][0] )
+            y1 = int( coordinates[box_index][1] )
+            x2 = int( coordinates[box_index][2] )
+            y2 = int( coordinates[box_index][3] )
             
             midX = round((x1 + x2)/2)
             midY = round((y1 + y2)/2)
             
-            # Creates dieNames list row and column number
-            rowNumber = math.floor((y1-minY)/(box_width*die_spacing)+1)
+            # Creates names list row and column number
+            rowNumber = math.floor((y1-minY)/(box_width*spacing)+1)
             rowNumber = str(rowNumber)
-            colNumber = math.floor((x1-minX)/(box_height*die_spacing)+1)
+            colNumber = math.floor((x1-minX)/(box_height*spacing)+1)
             colNumber = str(colNumber)
             
             if "SMiPE4" in SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0]:
@@ -429,12 +429,12 @@ for image_name in os.listdir(TO_PREDICT_PATH):
             elif int(real_rowNum) < 100:
                 real_rowNum = "0" + str(real_rowNum)
             
-            dieNames.append( "R_{}.C_{}".format(real_rowNum, real_colNum) )
+            names.append( "R_{}.C_{}".format(real_rowNum, real_colNum) )
             
-            xmin = int(dieCoordinates[box_index][0])
-            ymin = int(dieCoordinates[box_index][1])
-            xmax = int(dieCoordinates[box_index][2])
-            ymax = int(dieCoordinates[box_index][3])
+            xmin = int(coordinates[box_index][0])
+            ymin = int(coordinates[box_index][1])
+            xmax = int(coordinates[box_index][2])
+            ymax = int(coordinates[box_index][3])
             
             real_image_name = "R_{}.C_{}.jpg".format(real_rowNum, real_colNum)
             save_image(transformed_image[:, ymin:ymax, xmin:xmax]/255, 
