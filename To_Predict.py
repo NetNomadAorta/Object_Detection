@@ -131,7 +131,7 @@ classes_1
 # lets load the faster rcnn model
 model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
                                                    box_detections_per_img=500,
-                                                   min_size=1700,
+                                                   min_size=1650,
                                                    max_size=2500
                                                    )
 in_features = model_1.roi_heads.box_predictor.cls_score.in_features # we need to change the head
