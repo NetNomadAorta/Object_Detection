@@ -29,8 +29,6 @@ PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 MIN_SCORE               = 0.6
-NUMBER_TO_RUN = 1000
-NUMBER_PER_IMAGE = 0
 
 
 def time_convert(sec):
@@ -130,10 +128,6 @@ pred_dict = {}
 ii = 0
 
 for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
-    
-    # TESTING - Only completes up to index (NUMBER_TO_RUN-1)
-    if image_index == NUMBER_TO_RUN:
-        break
     if "_annotations.coco.json" in image_name:
         continue
     
@@ -221,20 +215,7 @@ for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
     # --------------------------------------------------------------
     
     # =========================================================================
-    
-                
-    for i in range(NUMBER_PER_IMAGE-box_count):
-        # JSON info
-        index += 1
-        ids.append(index)
-        image_ids.append(image_ids[-1]) # image_id to place in annotations category
-        category_id.append(1)
-        bboxes = np.append(bboxes, [[transformed_image.shape[0]/2, transformed_image.shape[0]/2, bbox_width, bbox_height]], axis=0)
-        bbox_areas.append(bbox_area)
-        segmentations.append([])
-        iscrowd.append(0)
-    
-    
+
     if len(os.listdir(TO_PREDICT_PATH)) > 1000:
         tenScale = 1000
     else:
