@@ -20,14 +20,11 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/Lord_of_Models-0.model"
-DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
-IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
+SAVE_NAME_OD = "./Models/Lord_of_Models-0.model"
+DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models/",1)[1].split(".model",1)[0] +"/"
+IMAGE_SIZE              = 800
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
-# TO_PREDICT_PATH         = "//mcrtp-sftp-01/aoitool/SMiPE4-623/XDCC000109C2/"            # USE FOR XDisplay LOTS!
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
-# PREDICTED_PATH          = "//mcrtp-sftp-01/aoitool/SMiPE4-623-Cropped/XDCC000109C2/"    # USE FOR XDisplay LOTS!
-# PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = False
 SAVE_ORIGINAL_IMAGE     = False
 SAVE_CROPPED_IMAGES     = False

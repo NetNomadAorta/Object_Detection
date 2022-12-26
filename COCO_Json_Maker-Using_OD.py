@@ -22,9 +22,8 @@ import shutil
 
 # User parameters
 SAVE_NAME_OD = "./Models-OD/Lord_of_Models-0.model"
-DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models-OD/",1)[1].split("-",1)[0] +"/"
-
-IMAGE_SIZE              = int(re.findall(r'\d+', SAVE_NAME_OD)[-1] ) # Row and column number 
+DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models/",1)[1].split(".model",1)[0] +"/"
+IMAGE_SIZE              = 800
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 # PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
@@ -80,9 +79,9 @@ classes_1
 
 # lets load the faster rcnn model
 model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
-                                                   box_detections_per_img=500,
-                                                   min_size=1200,
-                                                   max_size=2500
+                                                   # box_detections_per_img=500,
+                                                   min_size=IMAGE_SIZE,
+                                                   max_size=IMAGE_SIZE*3
                                                    )
 in_features = model_1.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model_1.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes_1)
