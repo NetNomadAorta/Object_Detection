@@ -21,7 +21,7 @@ import shutil
 
 
 # User parameters
-SAVE_NAME_OD = "./Models-OD/Lord_of_Models-0.model"
+SAVE_NAME_OD = "./Models/Overwatch.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models/",1)[1].split(".model",1)[0] +"/"
 IMAGE_SIZE              = 800
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
@@ -60,6 +60,8 @@ print("\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
 # Deletes images already in "Predicted_Images" folder
 deleteDirContents(PREDICTED_PATH)
+if os.path.isfile(TO_PREDICT_PATH + "_annotations.coco.json"):
+    os.remove(TO_PREDICT_PATH + "_annotations.coco.json")
 
 
 dataset_path = DATASET_PATH
@@ -113,7 +115,7 @@ image_widths = []
 # For Json file
 index = -1
 ids = []
-image_ids = []
+bbox_image_ids = []
 category_id = []
 bboxes = np.zeros([1, 4], np.int32)
 bbox_areas = []
@@ -121,7 +123,7 @@ segmentations = []
 iscrowd = []
 
 # From object detection "To_Predict"
-color_list =['green', 'red', 'magenta', 'blue', 'orange', 'cyan', 'lime', 'turquoise', 'yellow']
+color_list =['green', 'red', 'green', 'blue', 'orange', 'cyan', 'lime', 'turquoise', 'yellow']
 # Below for SMiPE4
 # color_list =['white', 'gray', 'lime', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'gray']
 pred_dict = {}
@@ -152,7 +154,7 @@ for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
     image_widths.append(transformed_image.shape[2])
     
     if ii == 0:
-        line_width = max(round(transformed_image.shape[1] * 0.002), 1)
+        line_width = 3
     
     with torch.no_grad():
         prediction_1 = model_1([(transformed_image/255).to(device)])
@@ -203,7 +205,7 @@ for image_index, image_name in enumerate(os.listdir(TO_PREDICT_PATH)):
         # JSON info
         index += 1
         ids.append(index)
-        image_ids.append(image_ids[-1]) # image_id to place in annotations category
+        bbox_image_ids.append(image_ids[-1]) # image_id to place in annotations category
         category_id.append(class_indexes[box_index])
         if index == 0:
             bboxes[-1] = np.array([x1, y1, bbox_width, bbox_height], ndmin=2)
@@ -309,7 +311,7 @@ for index in ids:
             "annotations": [
                 {
                     "id": index,
-                    "image_id": image_ids[index],
+                    "image_id": bbox_image_ids[index],
                     "category_id": category_id[index],
                     "bbox": [
                         int(bboxes[index][0]),
@@ -330,7 +332,7 @@ for index in ids:
         to_update_with = {
             "annotations": {
                     "id": index,
-                    "image_id": image_ids[index],
+                    "image_id": bbox_image_ids[index],
                     "category_id": category_id[index],
                     "bbox": [
                         int(bboxes[index][0]),
