@@ -25,7 +25,7 @@ USE_CHECKPOINT = True
 IMAGE_SIZE     = 800
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models/",1)[1].split(".model",1)[0] +"/"
 NUMBER_EPOCH   = 10000
-BATCH_SIZE     = 1 # Default: Work_PC: 1
+BATCH_SIZE     = 4 # Default: Work_PC: 1
 LEARNING_RATE  = 0.001*BATCH_SIZE # Default: Work_PC: 0.001*BATCH_SIZE
 
 # Transformation Parameters:
