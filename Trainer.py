@@ -20,7 +20,7 @@ from albumentations.pytorch import ToTensorV2
 
 
 # User parameters
-SAVE_NAME      = "./Models/Overwatch.model"
+SAVE_NAME      = "./Models/EFT.model"
 USE_CHECKPOINT = True
 IMAGE_SIZE     = 800
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models/",1)[1].split(".model",1)[0] +"/"
