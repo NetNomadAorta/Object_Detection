@@ -59,50 +59,6 @@ def makeDir(dir, classes_2):
         os.makedirs(dir + className, exist_ok=True)
 
 
-# Deletes unnecessary string in file name
-def replaceFileName(slot_path):
-    for file_name in os.listdir(slot_path):
-        file_path = os.path.join(slot_path, file_name)
-        # For loop with row number as "i" will take longer, so yes below seems
-        #   redundant writing each number 1 by 1, but has to be done.
-        os.rename(file_path, 
-                  file_path.replace("Stitcher-Snaps_for_8in_Wafer_Pave.", "")\
-                          .replace("Die-1_Pave.", "")\
-                          .replace("Die1_Pave.", "")\
-                          .replace("Med_El-A_River_1_Pave.", "")\
-                          .replace("new_RefDes_1_PaveP1.", "")\
-                          .replace("new_RefDes_1_Pave.", "")\
-                          .replace("Window_Die1_Pave.", "")\
-                          .replace("TPV2_Pave.", "")\
-                          .replace("A-Unity_Pave.", "")\
-                          .replace("E-Merlin_Pave.", "")\
-                          .replace("A-Exoplanet_Pave.", "")\
-                          .replace("Window_", "")\
-                          .replace("Row_1.", "Row_01.")\
-                          .replace("Col_1.", "Col_01.")\
-                          .replace("Row_2.", "Row_02.")\
-                          .replace("Col_2.", "Col_02.")\
-                          .replace("Row_3.", "Row_03.")\
-                          .replace("Col_3.", "Col_03.")\
-                          .replace("Row_4.", "Row_04.")\
-                          .replace("Col_4.", "Col_04.")\
-                          .replace("Row_5.", "Row_05.")\
-                          .replace("Col_5.", "Col_05.")\
-                          .replace("Row_6.", "Row_06.")\
-                          .replace("Col_6.", "Col_06.")\
-                          .replace("Row_7.", "Row_07.")\
-                          .replace("Col_7.", "Col_07.")\
-                          .replace("Row_8.", "Row_08.")\
-                          .replace("Col_8.", "Col_08.")\
-                          .replace("Row_9.", "Row_09.")\
-                          .replace("Col_9.", "Col_09.")\
-                          .replace(".p0", "")\
-                          .replace(".p1", "")\
-                          .replace(".20",".P_")\
-                          .replace(".21", "P_1")
-                          )
-
-
 
 # Starting stopwatch to see how long process takes
 start_time = time.time()
@@ -157,9 +113,6 @@ transforms_1 = A.Compose([
     # A.Rotate(limit=[90,90], always_apply=True),
     ToTensorV2()
 ])
-
-
-replaceFileName(TO_PREDICT_PATH)
 
 # Start FPS timer
 fps_start_time = time.time()
