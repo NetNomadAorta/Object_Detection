@@ -9,10 +9,11 @@ import warnings
 warnings.filterwarnings("ignore")
 import time
 from torchvision.utils import draw_bounding_boxes
-from pycocotools.coco import COCO
+# from pycocotools.coco import COCO
 # Now, we will define our transforms
 from albumentations.pytorch import ToTensorV2
 import shutil
+import json
 
 
 # User parameters
@@ -65,12 +66,17 @@ dataset_path = DATASET_PATH
 
 
 #load classes
-coco = COCO(os.path.join(dataset_path, "train", "_annotations.coco.json"))
-categories = coco.cats
-n_classes_1 = len(categories.keys())
-categories
+# coco = COCO(os.path.join(dataset_path, "train", "_annotations.coco.json"))
+# categories = coco.cats
+# n_classes_1 = len(categories.keys())
+# categories
 
-classes_1 = [i[1]['name'] for i in categories.items()]
+f = open(os.path.join(dataset_path, "train", "_annotations.coco.json"))
+data = json.load(f)
+n_classes_1 = len(data['categories'])
+classes_1 = [i['name'] for i in data["categories"]]
+
+# classes_1 = [i[1]['name'] for i in categories.items()]
 
 
 
