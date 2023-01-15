@@ -22,6 +22,7 @@ from albumentations.pytorch import ToTensorV2
 # User parameters
 SAVE_NAME      = "./Models/ASL_Letters.model"
 USE_CHECKPOINT = True
+MOBILE_NET_TOGGLE = False
 IMAGE_SIZE     = 800
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models/",1)[1].split(".model",1)[0] +"/"
 NUMBER_EPOCH   = 10000
@@ -168,11 +169,20 @@ train_dataset = Object_Detection(root=dataset_path, transforms=get_transforms(Tr
 
 
 # lets load the faster rcnn model
-model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True,
-                                                 # box_detections_per_img=500,
-                                                 min_size=IMAGE_SIZE,
-                                                 max_size=IMAGE_SIZE*3
-                                                 )
+if MOBILE_NET_TOGGLE:
+    # Mobile Net
+    model = models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True,
+                                                     # box_detections_per_img=500,
+                                                     min_size=IMAGE_SIZE,
+                                                     max_size=IMAGE_SIZE*3
+                                                               )
+else:
+    # Faster RCNN
+    model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True,
+                                                     # box_detections_per_img=500,
+                                                     min_size=IMAGE_SIZE,
+                                                     max_size=IMAGE_SIZE*3
+                                                     )
 in_features = model.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes)
 
