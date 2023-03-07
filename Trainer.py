@@ -22,8 +22,8 @@ from albumentations.pytorch import ToTensorV2
 # User parameters
 SAVE_NAME      = "./Models/ASL_Letters.model"
 USE_CHECKPOINT = True
-MOBILE_NET_TOGGLE = False
-IMAGE_SIZE     = 800
+MOBILE_NET_TOGGLE = True
+IMAGE_SIZE     = 300
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models/",1)[1].split(".model",1)[0] +"/"
 NUMBER_EPOCH   = 10000
 BATCH_SIZE     = 4 # Default: Work_PC: 1

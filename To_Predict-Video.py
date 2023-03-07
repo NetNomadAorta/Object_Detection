@@ -4,13 +4,8 @@ from torchvision import models
 import re
 import cv2
 import albumentations as A  # our data augmentation library
-# remove arnings (optional)
-import warnings
-warnings.filterwarnings("ignore")
 import time
 from torchvision.utils import draw_bounding_boxes
-# from pycocotools.coco import COCO
-# Now, we will define our transforms
 from albumentations.pytorch import ToTensorV2
 import shutil
 import json
@@ -23,10 +18,7 @@ IMAGE_SIZE              = 800
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
 SAVE_ANNOTATED_IMAGES   = True
-SAVE_ORIGINAL_IMAGE     = False
-SAVE_CROPPED_IMAGES     = False
-SPACING_SCALE       = 0.99
-MIN_SCORE               = 0.7 # Default 0.5
+MIN_SCORE               = 0.6 # Default 0.6
 
 
 def time_convert(sec):
@@ -63,14 +55,6 @@ deleteDirContents(PREDICTED_PATH)
 
 dataset_path = DATASET_PATH
 
-
-
-#load classes
-# coco = COCO(os.path.join(dataset_path, "train", "_annotations.coco.json"))
-# categories = coco.cats
-# n_classes_1 = len(categories.keys())
-# categories
-
 f = open(os.path.join(dataset_path, "train", "_annotations.coco.json"))
 data = json.load(f)
 n_classes_1 = len(data['categories'])
@@ -82,9 +66,8 @@ classes_1 = [i['name'] for i in data["categories"]]
 
 # lets load the faster rcnn model
 model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
-                                                   box_detections_per_img=500,
-                                                   min_size=1700, # 1200 at work, 1700 at home
-                                                   max_size=2500
+                                                   min_size=MIN_IMAGE_SIZE,
+                                                   max_size=MIN_IMAGE_SIZE*3
                                                    )
 in_features = model_1.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model_1.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes_1)
@@ -107,18 +90,12 @@ model_1 = model_1.to(device)
 model_1.eval()
 torch.cuda.empty_cache()
 
-transforms_1 = A.Compose([
-    # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-    # A.Rotate(limit=[90,90], always_apply=True),
-    ToTensorV2()
-])
-
+transforms_1 = A.Compose([ToTensorV2()])
 
 # Start FPS timer
 fps_start_time = time.time()
 
 color_list =['green', 'red', 'blue', 'magenta', 'orange', 'cyan', 'lime', 'turquoise', 'yellow']
-pred_dict = {}
 ii = 0
 for video_name in os.listdir(TO_PREDICT_PATH):
     video_path = os.path.join(TO_PREDICT_PATH, video_name)

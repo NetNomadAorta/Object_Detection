@@ -22,8 +22,9 @@ import json
 
 
 # User parameters
-SAVE_NAME_OD = "./Models/Overwatch.model"
+SAVE_NAME_OD = "./Models/ASL_Letters.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models/",1)[1].split(".model",1)[0] +"/"
+MOBILE_NET_TOGGLE = False
 IMAGE_SIZE              = 800
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
@@ -84,11 +85,20 @@ classes_1 = [i['name'] for i in data["categories"]]
 
 
 # lets load the faster rcnn model
-model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True, 
-                                                   # box_detections_per_img=500,
-                                                   min_size=IMAGE_SIZE,
-                                                   max_size=IMAGE_SIZE*3
-                                                   )
+if MOBILE_NET_TOGGLE:
+    # Mobile Net
+    model_1 = models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True,
+                                                     # box_detections_per_img=500,
+                                                     min_size=IMAGE_SIZE,
+                                                     max_size=IMAGE_SIZE*3
+                                                               )
+else:
+    # Faster RCNN
+    model_1 = models.detection.fasterrcnn_resnet50_fpn(pretrained=True,
+                                                     # box_detections_per_img=500,
+                                                     min_size=IMAGE_SIZE,
+                                                     max_size=IMAGE_SIZE*3
+                                                     )
 in_features = model_1.roi_heads.box_predictor.cls_score.in_features # we need to change the head
 model_1.roi_heads.box_predictor = models.detection.faster_rcnn.FastRCNNPredictor(in_features, n_classes_1)
 
