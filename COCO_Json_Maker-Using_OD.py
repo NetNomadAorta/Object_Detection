@@ -13,8 +13,6 @@ import albumentations as A  # our data augmentation library
 import warnings
 warnings.filterwarnings("ignore")
 from torchvision.utils import draw_bounding_boxes
-# from pycocotools.coco import COCO
-# Now, we will define our transforms
 from albumentations.pytorch import ToTensorV2
 from torchvision.utils import save_image
 import shutil
@@ -22,13 +20,12 @@ import json
 
 
 # User parameters
-SAVE_NAME_OD = "./Models/ASL_Letters.model"
+SAVE_NAME_OD = "./Models/Construction.model"
 DATASET_PATH = "./Training_Data/" + SAVE_NAME_OD.split("./Models/",1)[1].split(".model",1)[0] +"/"
 MOBILE_NET_TOGGLE = False
 IMAGE_SIZE              = 800
 TO_PREDICT_PATH         = "./Images/Prediction_Images/To_Predict/"
 PREDICTED_PATH          = "./Images/Prediction_Images/Predicted_Images/"
-# PREDICTED_PATH        = "C:/Users/troya/.spyder-py3/ML-Defect_Detection/Images/Prediction_Images/To_Predict_Images/"
 SAVE_ANNOTATED_IMAGES   = True
 MIN_SCORE               = 0.6
 
@@ -68,20 +65,10 @@ if os.path.isfile(TO_PREDICT_PATH + "_annotations.coco.json"):
 
 dataset_path = DATASET_PATH
 
-
-#load classes
-# coco = COCO(os.path.join(dataset_path, "train", "_annotations.coco.json"))
-# categories = coco.cats
-# n_classes_1 = len(categories.keys())
-
 f = open(os.path.join(dataset_path, "train", "_annotations.coco.json"))
 data = json.load(f)
 n_classes_1 = len(data['categories'])
 classes_1 = [i['name'] for i in data["categories"]]
-
-# classes_1 = [i[1]['name'] for i in categories.items()]
-# classes_1
-
 
 
 # lets load the faster rcnn model
@@ -115,11 +102,7 @@ model_1 = model_1.to(device)
 model_1.eval()
 torch.cuda.empty_cache()
 
-transforms_1 = A.Compose([
-    # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-    # A.Rotate(limit=[90,90], always_apply=True),
-    ToTensorV2()
-])
+transforms_1 = A.Compose([ToTensorV2()])
 
 
 # For Json file
@@ -140,8 +123,6 @@ iscrowd = []
 
 # From object detection "To_Predict"
 color_list =['green', 'red', 'green', 'blue', 'orange', 'cyan', 'lime', 'turquoise', 'yellow']
-# Below for SMiPE4
-# color_list =['white', 'gray', 'lime', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'gray']
 pred_dict = {}
 ii = 0
 

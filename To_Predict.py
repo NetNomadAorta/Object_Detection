@@ -114,7 +114,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
     transformed_image = transformed_image["image"]
     
     if ii == 0:
-        line_width = max(round(transformed_image.shape[1] * 0.002), 1)
+        line_width = max(round(transformed_image.shape[1] * 0.004), 1)
     
     with torch.no_grad():
         prediction_1 = model_1([(transformed_image/255).to(device)])
@@ -232,7 +232,7 @@ for image_name in os.listdir(TO_PREDICT_PATH):
                         PREDICTED_PATH + image_name.replace(".jpg","") + "-{}-Cropped.jpg".format(box_index))
     
     
-    ten_scale = int(len(os.listdir(TO_PREDICT_PATH))*0.01)
+    ten_scale = round(len(os.listdir(TO_PREDICT_PATH))*0.02)
     
     ii += 1
     if ii % ten_scale == 0:

@@ -22,25 +22,26 @@ from albumentations.pytorch import ToTensorV2
 # User parameters
 SAVE_NAME      = "./Models/ASL_Letters.model"
 USE_CHECKPOINT = True
-MOBILE_NET_TOGGLE = True
-IMAGE_SIZE     = 300
+MOBILE_NET_TOGGLE = False
+IMAGE_SIZE     = int(1080*1.0) # Default is 800
 DATASET_PATH   = "./Training_Data/" + SAVE_NAME.split("./Models/",1)[1].split(".model",1)[0] +"/"
 NUMBER_EPOCH   = 10000
 BATCH_SIZE     = 4 # Default: Work_PC: 1
 LEARNING_RATE  = 0.001*BATCH_SIZE # Default: Work_PC: 0.001*BATCH_SIZE
 
 # Transformation Parameters:
-BLUR_PROB           = 0.05  # Default: 0.05 
-DOWNSCALE_PROB      = 0.25  # Default: 0.10 
-NOISE_PROB          = 0.05  # Default: 0.05 
-MOTION_BLUR_PROB    = 0.05  # Default: 0.05
-ROTATION            = 5     # Default: 5
-BRIGHTNESS_CHANGE   = 0.10  # Default: 0.10
-CONTRAST_CHANGE     = 0.05  # Default: 0.05
-SATURATION_CHANGE   = 0.05  # Default: 0.05
-HUE_CHANGE          = 0.05  # Default: 0.05
-HORIZ_FLIP_CHANCE   = 0.20  # Default: 0.10
-VERT_FLIP_CHANCE    = 0.20  # Default: 0.10
+BLUR_PROB           = 0.15  # Default: 0.15
+DOWNSCALE_PROB      = 0.20  # Default: 0.20
+NOISE_PROB          = 0.50  # Default: 0.5
+ISONOISE_PROB       = 0.50  # Default: 0.5
+MOTION_BLUR_PROB    = 0.20  # Default: 0.20
+ROTATION            = 30    # Default: 30
+BRIGHTNESS_CHANGE   = 0.20  # Default: 0.20
+CONTRAST_CHANGE     = 0.20  # Default: 0.20
+SATURATION_CHANGE   = 0.20  # Default: 0.20
+HUE_CHANGE          = 0.20  # Default: 0.20
+HORIZ_FLIP_CHANCE   = 0.25  # Default: 0.25
+VERT_FLIP_CHANCE    = 0.20  # Default: 0.20
 
 
 
@@ -57,27 +58,26 @@ def get_transforms(train=False):
         transform = A.Compose([
             # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # I don't include anymore because OD models doesn't discriminate against size
             # A.Rotate(limit=[90,90], always_apply=True),
-            A.GaussianBlur(blur_limit = (3,5), p = BLUR_PROB),
-            A.Downscale(scale_min = 0.35, scale_max = 0.99, p = DOWNSCALE_PROB),
-            A.GaussNoise(var_limit = (1.0, 10.0), p = NOISE_PROB),
-            A.MotionBlur(5, p = MOTION_BLUR_PROB),
-            A.ColorJitter(brightness = BRIGHTNESS_CHANGE, 
-                          contrast = CONTRAST_CHANGE, 
-                          saturation = SATURATION_CHANGE, 
-                          hue = HUE_CHANGE, 
-                          p = 0.1),
-            A.HorizontalFlip(p = HORIZ_FLIP_CHANCE),
-            A.VerticalFlip(p = VERT_FLIP_CHANCE),
-            A.RandomRotate90(p = 0.2),
-            A.Rotate(limit = [-ROTATION, ROTATION]),
+            A.GaussianBlur(blur_limit=(3, 5), p=BLUR_PROB),
+            A.Downscale(scale_min=0.40, scale_max=0.99, p=DOWNSCALE_PROB),
+            A.GaussNoise(var_limit=(1.0, 500.0), p=NOISE_PROB),
+            A.ISONoise (color_shift=(0.01, 0.05), intensity=(0.1, 0.5), always_apply=False, p=ISONOISE_PROB),
+            A.MotionBlur(5, p=MOTION_BLUR_PROB),
+            A.ColorJitter(brightness=BRIGHTNESS_CHANGE,
+                          contrast=CONTRAST_CHANGE,
+                          saturation=SATURATION_CHANGE,
+                          hue=HUE_CHANGE,
+                          p=0.40),
+            A.HorizontalFlip(p=HORIZ_FLIP_CHANCE),
+            A.VerticalFlip(p=VERT_FLIP_CHANCE),
+            A.RandomRotate90(p=0.2),
+            A.Rotate(limit=[-ROTATION, ROTATION]),
             ToTensorV2()
-        ], bbox_params = A.BboxParams(format = 'coco') )
+        ], bbox_params=A.BboxParams(format='coco'))
     else:
         transform = A.Compose([
-            # A.Resize(IMAGE_SIZE, IMAGE_SIZE), # our input size can be 600px
-            # A.Rotate(limit=[90,90], always_apply=True),
             ToTensorV2()
-        ], bbox_params = A.BboxParams(format = 'coco') )
+        ], bbox_params=A.BboxParams(format='coco'))
     return transform
 
 
